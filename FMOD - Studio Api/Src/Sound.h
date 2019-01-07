@@ -14,16 +14,16 @@ private:
 	enum SoundState { READY, PLAYING, PAUSED };
 
 	//Atributos del canal
-	bool mute = false;
-	bool loop = false;
+	bool _mute = false;
+	int _loopCount = 0;
 
-	float volume = 1.0; //(0-1)
-	float pitch = 1.0; // (0-6)
+	float _volume = 1.0; //(0-1)
+	float _pitch = 1.0; // (0-6)
 
-	float pan;
-	float frequency;
+	float _pan;
+	float _frequency;
 
-	std::list<FMOD::DSP> DSPList;
+	std::list<FMOD::DSP*> DSPList;
 
 
 	/// <summary>
@@ -47,22 +47,21 @@ private:
 
 public:
 
-	Sound(std::string name) {
-		_name = name;
-		currentState = SoundState::READY;
-	}
+	Sound(std::string name);
+	virtual ~Sound();
 
-	virtual ~Sound() {
-		LowLevelSystem::ERRCHECK(sound->release());
-	}
-
-	void SetPan(float pan);
 
 	bool IsPaused();
 	bool HasEnded();
 	void ResetChannel();
 	void SetFrequency(float newFrequency);
-
+	void SetMuted(bool muted);
+	void SetLoopCount(int loopCount);
+	void SetVolume(float volume);
+	void SetPitch(float pitch);
+	void AddDSP(FMOD::DSP *DSP);
+	void SetPan(float pan);
+	void SetMSPosition(int position);
 
 
 	/// <summary>
@@ -87,6 +86,16 @@ public:
 	void Resume();
 
 
+
+
+protected:
+	virtual void InitAttributes();
+
+	/// <summary>
+	/// Controla el flujo de estados
+	/// Además, si ha acabado un sonido, lo carga de nuevo
+	/// </summary>
+	virtual void Update();
 
 };
 #endif // #ifndef __Sound3D_h_
