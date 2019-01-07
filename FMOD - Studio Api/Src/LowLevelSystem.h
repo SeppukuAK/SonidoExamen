@@ -27,14 +27,33 @@ private:
 	/// Instancia de LowLevelSystem
 	/// </summary>
 	FMOD::System *system;
-	//TODO: MASTER CHANNEL
 
 	/// <summary>
 	/// Ruta donde se encuentran los archivos de audio de la escena
 	/// </summary>
 	const char* AUDIOPATH = "../../Media/";
 
+	//TODO: MASTER CHANNEL
+
 public:
+
+	LowLevelSystem();
+	~LowLevelSystem();
+
+	/// <summary>
+	/// Update del system. 
+	/// </summary>
+	void Update();
+
+	FMOD::Sound* Create2DSound(std::string name);
+	FMOD::Sound* Create3DSound(std::string name);
+
+	FMOD::Channel* CreateChannel(FMOD::Sound *sound);
+	//TODO: CHANNEL GROUP
+	FMOD::Reverb3D* CreateReverb();
+	FMOD::Geometry* CreateGeometry(int maxPoligons, int maxVertex);
+	FMOD::DSP* CreateDSPByType(FMOD_DSP_TYPE DSPType);
+
 #pragma region SYSTEM_PARAMETERS
 	/// <summary>
 	/// Devuelve la variación de frecuencia por la velocidad
@@ -50,13 +69,13 @@ public:
 		return dopplerScale;
 	}
 
-   /// <summary>
-   /// Devuelve las dimensiones del escenario de cara al motor de sonido
-   /// 1.0 = valor natural
-   /// 0.0 = Lo anula
-   /// >1.0 => Exagera el fenómeno 
-   /// </summary>
-   /// <returns></returns>
+	/// <summary>
+	/// Devuelve las dimensiones del escenario de cara al motor de sonido
+	/// 1.0 = valor natural
+	/// 0.0 = Lo anula
+	/// >1.0 => Exagera el fenómeno 
+	/// </summary>
+	/// <returns></returns>
 	float GetDistanceFactor()
 	{
 		float dopplerScale, distanceFactor, rollOffScale;
@@ -79,62 +98,45 @@ public:
 	}
 
 	/// <summary>
-    /// Establece la variación de frecuencia por la velocidad
-    /// </summary>
-    /// <param name="dopplerScale">   
-    /// 1.0 = valor natural
-    /// 0.0 = Lo anula
-    /// >1.0 => Exagera el fenómeno 
-    /// </param>
+	/// Establece la variación de frecuencia por la velocidad
+	/// </summary>
+	/// <param name="dopplerScale">   
+	/// 1.0 = valor natural
+	/// 0.0 = Lo anula
+	/// >1.0 => Exagera el fenómeno 
+	/// </param>
 	void SetDopplerScale(float dopplerScale)
 	{
 		ERRCHECK(system->set3DSettings(dopplerScale, GetDistanceFactor(), GetRollOffScale()));
 	}
 
 	/// <summary>
-    /// Establece las dimensiones del escenario de cara al motor de sonido
-    /// </summary>
-    /// <param name="rollOffScale">   
-    /// 1.0 = valor natural
-    /// 0.0 = Lo anula
-    /// >1.0 => Exagera el fenómeno 
-    /// </param>
+	/// Establece las dimensiones del escenario de cara al motor de sonido
+	/// </summary>
+	/// <param name="rollOffScale">   
+	/// 1.0 = valor natural
+	/// 0.0 = Lo anula
+	/// >1.0 => Exagera el fenómeno 
+	/// </param>
 	void SetDistanceFactor(float distanceFactor)
 	{
 		ERRCHECK(system->set3DSettings(GetDopplerScale(), distanceFactor, GetRollOffScale()));
 	}
 
 	/// <summary>
-    /// Establece la atenuación con la distancia
-    /// </summary>
-    /// <param name="rollOffScale">   
-    /// 1.0 = valor natural
-    /// 0.0 = Lo anula
-    /// >1.0 => Exagera el fenómeno 
-    /// </param>
+	/// Establece la atenuación con la distancia
+	/// </summary>
+	/// <param name="rollOffScale">   
+	/// 1.0 = valor natural
+	/// 0.0 = Lo anula
+	/// >1.0 => Exagera el fenómeno 
+	/// </param>
 	void SetRollOffScale(float rollOffScale)
 	{
 		ERRCHECK(system->set3DSettings(GetDopplerScale(), GetDistanceFactor(), rollOffScale));
 	}
 
 #pragma endregion SYSTEM_PARAMETERS
-
-	LowLevelSystem();
-	~LowLevelSystem();
-
-	/// <summary>
-	/// Update del system. 
-	/// </summary>
-	void Update();
-
-	FMOD::Sound* Create3DSound(std::string name);
-	FMOD::Sound* Create2DSound(std::string name);
-
-	FMOD::Channel* CreateChannel(FMOD::Sound *sound);
-	//TODO: CHANNEL GROUP
-	FMOD::Reverb3D* CreateReverb();
-	FMOD::Geometry* CreateGeometry(int maxPoligons, int maxVertex);
-	FMOD::DSP* CreateDSP(FMOD_DSP_TYPE DSPType);
 
 	//Facilita la gestión de errores
 	static void ERRCHECK(FMOD_RESULT result) {
