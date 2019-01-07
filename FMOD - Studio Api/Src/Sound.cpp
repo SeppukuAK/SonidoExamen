@@ -6,16 +6,17 @@
 Sound::Sound(std::string name) {
 	_name = name;
 	currentState = SoundState::READY;
-}
 
-Sound::~Sound() {
-	LowLevelSystem::ERRCHECK(sound->release());
-}
-
-void Sound::InitAttributes() { //Frecuencia
+	//?????
 	LowLevelSystem::ERRCHECK(channel->getFrequency(&_frequency)); //Inicializa el valor de frequency
 
 }
+
+Sound::~Sound() {
+	LowLevelSystem::ERRCHECK(_sound->release());
+}
+
+
 
 /// <summary>
 /// Reproduce el sonido
@@ -31,7 +32,7 @@ void Sound::Play()
 		LowLevelSystem::ERRCHECK(channel->setPaused(false));
 
 }
-
+#pragma region Flow
 /// <summary>
 /// Para el sonido si está reproduciendose o pausado
 /// Se libera el canal 
@@ -66,7 +67,12 @@ void Sound::Resume()
 	if (currentState == SoundState::PAUSED)
 		LowLevelSystem::ERRCHECK(channel->setPaused(false));
 }
+#pragma endregion
 
+
+/// <summary>
+/// Actualiza el estado actual del sonido
+/// </summary>
 void Sound::CheckState() {
 
 	switch (currentState) {
@@ -93,6 +99,18 @@ void Sound::CheckState() {
 	}
 }
 
+#pragma region CheckStateMethods
+/// <summary>
+/// Devuelve si el sonido está reproduciendose
+/// </summary>
+/// <returns></returns>
+bool Sound::IsPlaying()
+{
+	bool isPlaying;
+	LowLevelSystem::ERRCHECK(channel->getPaused(&isPlaying));
+	return isPlaying;
+}
+
 /// <summary>
 /// Devuelve si el sonido está pausado
 /// </summary>
@@ -113,27 +131,10 @@ bool Sound::HasEnded()
 	bool playing;
 	return channel->isPlaying(&playing) == FMOD_ERR_INVALID_HANDLE;
 }
+#pragma endregion  CheckStateMethods
 
-/// <summary>
-/// Crea un nuevo canal con los parámetros del anterior
-/// </summary>
-void Sound::ResetChannel()
-{
-	//channel->clearHandle();
-	channel = LowLevelSystem::GetInstance()->CreateChannel(sound);
-	currentState = SoundState::READY;
-	SetFrequency(_frequency);
 
-	int i = 0;
-
-	//Se vuelven a añadir todos los efectos al canal
-	for (auto it = DSPList.begin(); it != DSPList.end(); ++it)
-	{
-		LowLevelSystem::ERRCHECK(channel->addDSP(i, (*it)));
-		i++;
-	}
-}
-#pragma region Atributtes
+#pragma region SetAtributtes
 /// <summary>
 /// Silencia el sonido o le pone volumen previo a ser muteado
 /// </summary>
@@ -145,11 +146,12 @@ void Sound::SetMuted(bool muted)
 	LowLevelSystem::ERRCHECK(channel->setMute(_mute));
 }
 
+
 /// <summary>
-	/// Establece el número de veces que tiene que reproducirse en loop
-	/// -1 para infinito | 0 una vez | 2 3 veces
-	/// </summary>
-	/// <param name="loop"></param>
+/// Establece el número de veces que tiene que reproducirse en loop
+/// -1 para infinito | 0 una vez | 2 3 veces
+/// </summary>
+/// <param name="loop"></param>
 void Sound::SetLoopCount(int loopCount)
 {
 	CheckState();
@@ -169,6 +171,7 @@ void Sound::SetVolume(float volume)
 	LowLevelSystem::ERRCHECK(channel->setVolume(_volume));
 }
 
+
 /// <summary>
 /// Establece el pitch del sonido
 /// </summary>
@@ -179,6 +182,7 @@ void  Sound::SetPitch(float pitch)
 	_pitch = pitch;
 	LowLevelSystem::ERRCHECK(channel->setPitch(_pitch));
 }
+
 
 /// <summary>
 /// Establece la frecuencia del sonido
@@ -203,27 +207,52 @@ void Sound::AddDSP(FMOD::DSP* DSP) {
 }
 
 /// <summary>
+/// Establece la panorámica del sound 
+/// </summary>
+/// <param name="newFrequency"></param>
+void Sound::SetPan(float pan) {
+	CheckState();
+	_pan = pan;
+	LowLevelSystem::ERRCHECK(channel->setPan(pan));
+}
+
+/// <summary>
 /// Establece la posición de reproducción de la pista en milisegundos
 /// </summary>
 /// <param name="position"></param>
 void Sound::SetMSPosition(int position)
 {
-	CheckState();
 	LowLevelSystem::ERRCHECK(channel->setPosition(position, FMOD_TIMEUNIT_MS));
 }
 
+#pragma endregion SetAtributtes
+
+
 /// <summary>
-/// Establece la panorámica del sound 
+/// Crea un nuevo canal con los parámetros del anterior
 /// </summary>
-/// <param name="newFrequency"></param>
-void Sound::SetPan(float pan) {
-	LowLevelSystem::ERRCHECK(channel->setPan(pan));
+void Sound::ResetChannel()
+{
+	//channel->clearHandle();
+	channel = LowLevelSystem::GetInstance()->CreateChannel(_sound);
+	currentState = SoundState::READY;
+
+	SetFrequency(_frequency);
+	SetMuted(_mute);
+	SetLoopCount(_loopCount);
+	SetVolume(_volume);
+	SetPitch(_pitch);
+	SetPan(_pan);
+
+	int i = 0;
+
+	//Se vuelven a añadir todos los efectos al canal
+	for (auto it = DSPList.begin(); it != DSPList.end(); ++it)
+	{
+		LowLevelSystem::ERRCHECK(channel->addDSP(i, (*it)));
+		i++;
+	}
 }
-
-#pragma endregion Atributtes
-
-
-
 
 /// <summary>
 /// Controla el flujo de estados

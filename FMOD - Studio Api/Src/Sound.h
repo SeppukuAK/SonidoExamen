@@ -25,35 +25,23 @@ private:
 
 	std::list<FMOD::DSP*> DSPList;
 
-
-	/// <summary>
-	/// Unifica el tratamiento de los diferentes formatos de sonido
-	/// </summary>
-	FMOD::Sound* sound;
-
-	/// <summary>
-	/// Controla parámetros del canal
-	/// </summary>
-	FMOD::Channel* channel;
-
-	/// <summary>
 	/// Estado actual de la reproducción
-	/// </summary>
 	SoundState currentState;
 
+	/// nombre del archivo de audio
 	std::string _name;
-
-	void CheckState();
 
 public:
 
 	Sound(std::string name);
 	virtual ~Sound();
 
-
+	//Métodos de comprobación de estado
+	bool IsPlaying();
 	bool IsPaused();
 	bool HasEnded();
-	void ResetChannel();
+
+	//Métodos de modificación de atributos
 	void SetFrequency(float newFrequency);
 	void SetMuted(bool muted);
 	void SetLoopCount(int loopCount);
@@ -89,13 +77,35 @@ public:
 
 
 protected:
-	virtual void InitAttributes();
+
+	//Atributos
+
+	/// <summary>
+	/// Controla parámetros del canal
+	/// </summary>
+	FMOD::Channel* channel;
+
+	/// <summary>
+	/// Unifica el tratamiento de los diferentes formatos de sonido
+	/// </summary>
+	FMOD::Sound* _sound;
+
+
+	//Métodos
+
+	/// <summary>
+	/// Actualiza el estado actual del sonido
+	/// </summary>
+	virtual void CheckState();
 
 	/// <summary>
 	/// Controla el flujo de estados
 	/// Además, si ha acabado un sonido, lo carga de nuevo
 	/// </summary>
 	virtual void Update();
+
+	//Establece los atributos de nuevo al sonido cuando se vuelve a crear el canal
+	void ResetChannel();
 
 };
 #endif // #ifndef __Sound3D_h_
