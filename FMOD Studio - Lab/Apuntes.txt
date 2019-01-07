@@ -1,0 +1,67 @@
+Las muestras que se utilicen se arrastran a assets
+
+#unassigned. No está en ingun banco
+
+La pestaña de abajo se llama Deck. Es donde s emuestran las propiedades
+
+Si arrastras 3 assets a un atrack, se crea un Multi Instrument
+
+Se reproducen aleatoriamente
+Se puede modificar.
+Click derecho puedes ver porcentaje
+
+En deck
+Click derecho pitch
+Add modulation Random
+
+Alterar el pitch humaniza los pasos
+
+Vamos a añadir una parametro recinto. 
+
+Pinchamos en el track
+Y abajo sale pre-pos donde podemos insertar efectos
+el pre
+add effect - reverb
+
+Añade un loop region
+
+El toca el wet level
+click derecho automatizacion
+
+Se crea una pista de automatizacion
+
+Podemos controlar la reverb añadiendo un parametro
+
+En el más al lado de timeline -> Boton derecho, new parameter. Nombre recinto
+
+Arriba hay una ruedecita que pone recinto
+
+Hace una rampa de 0 a 1
+
+Y cuando varias la ruedecita, afecta a la muestra
+
+PRIMERO HABIA QUE CREAR RECINTO AAAAAAAA
+
+esto se podria exportar y tenemos un parametro recinto que puede modificar la muestra
+
+En la linea de tiempo
+Add destination Marker.
+Es una direccion que puedo referenciar despues
+Se puede poner transtion
+
+Crea un nuevo parametro velocidad
+
+Le da condicion a los marcadores
+
+COMPILAR
+SAVE GUARDA EL PROYECTO
+ESTO NO ES COMESTIBLE POR LA API
+
+HAY QUE GENERAR UN BANCO COMPILADO
+
+BUILD
+
+ANTES HAY QUE ASGINAR EL EVENTO A UN BANCO: MASTER
+
+En los ordenadore shay codigo de fmod studio:
+Hay ejemplos
