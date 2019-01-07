@@ -1,6 +1,5 @@
 #include "LowLevelSystem.h"
 
-
 using namespace std;
 using namespace FMOD;
 
@@ -53,6 +52,23 @@ void LowLevelSystem::Update()
 	ERRCHECK(system->update());
 }
 
+// <summary>
+/// Crea un sonido 2D
+/// </summary>
+/// <param name="name"></param>
+/// <returns></returns>
+Sound* LowLevelSystem::Create2DSound(string name)
+{
+	Sound * sound = nullptr;
+
+	char aux[100];//TODO: 100?
+	strcpy_s(aux, AUDIOPATH); // copy string one into the result.
+	strcat_s(aux, sizeof aux, name.c_str());
+
+	ERRCHECK(system->createSound(aux, FMOD_2D | FMOD_LOOP_NORMAL, 0, &sound));
+
+	return sound;
+}
 
 /// <summary>
 /// Crea un sonido 3D
@@ -67,30 +83,12 @@ Sound* LowLevelSystem::Create3DSound(string name)
 	strcpy_s(aux, AUDIOPATH); // copy string one into the result.
 	strcat_s(aux, sizeof aux, name.c_str());
 
-	//TODO: Solo va con .wav
 	ERRCHECK(system->createSound(aux, FMOD_3D | FMOD_LOOP_NORMAL, 0, &sound));
 
 	return sound;
 }
 
-// <summary>
-/// Crea un sonido 2D
-/// </summary>
-/// <param name="name"></param>
-/// <returns></returns>
-Sound* LowLevelSystem::Create2DSound(string name)
-{
-	Sound * sound = nullptr;
 
-	char aux[100];
-	strcpy_s(aux, AUDIOPATH); // copy string one into the result.
-	strcat_s(aux, sizeof aux, name.c_str());
-
-	//TODO: Solo va con .wav
-	ERRCHECK(system->createSound(aux, FMOD_2D | FMOD_LOOP_NORMAL, 0, &sound));
-
-	return sound;
-}
 /// <summary>
    /// Crea un canal asociado al sonido
    /// Arranca en pause para dejarlo disponible en memoria
@@ -155,7 +153,7 @@ Geometry* LowLevelSystem::CreateGeometry(int maxPoligons, int maxVertex)
 /// </summary>
 /// <param name="DSPType"></param>
 /// <returns></returns>
-DSP* LowLevelSystem::CreateDSP(FMOD_DSP_TYPE DSPType)
+DSP* LowLevelSystem::CreateDSPByType(FMOD_DSP_TYPE DSPType)
 {
 	DSP *dsp;
 	ERRCHECK(system->createDSPByType(DSPType, &dsp));

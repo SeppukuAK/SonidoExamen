@@ -33,6 +33,9 @@
     <ClCompile Include="..\..\Src\Sound.cpp">
       <Filter>Source Files\LowLevelSystem</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Src\AudioGeometry.cpp">
+      <Filter>Source Files\LowLevelSystem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Src\LowLevelSystem.h">
@@ -42,6 +45,9 @@
       <Filter>Header Files\LowLevelSystem</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Src\Sound.h">
+      <Filter>Header Files\LowLevelSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\AudioGeometry.h">
       <Filter>Header Files\LowLevelSystem</Filter>
     </ClInclude>
   </ItemGroup>
