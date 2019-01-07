@@ -19,7 +19,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Src\LowLevelSystem.cpp" />
     <ClCompile Include="..\..\Src\main.cpp" />
+    <ClCompile Include="..\..\Src\Sound.cpp" />
+    <ClCompile Include="..\..\Src\Sound3D.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Src\LowLevelSystem.h" />
+    <ClInclude Include="..\..\Src\Sound.h" />
+    <ClInclude Include="..\..\Src\Sound3D.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
