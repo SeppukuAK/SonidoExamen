@@ -288,8 +288,10 @@ void gotoxy(int x, int y) {
 	SetConsoleCursorPosition(hcon, dwPos);
 }
 
+TileType tileMap[30][30];
+
 //Renderiza el tileMap y los valores
-void render(TileType tileMap[30][30], float minD, float maxD, float coneI, float coneO)
+void render( float minD, float maxD, float coneI, float coneO)
 {
 	gotoxy(0, 0);
 
@@ -352,6 +354,51 @@ void createGeometry()
 		{ vertex[1] ,vertex[3] ,vertex[0] }
 	};
 	AudioGeometry * audioGeometry = new AudioGeometry(2, 3, 1.0f, 0.5f, true, *poligons);
+
+	for (int i = 0; i < 10; i++) {
+		tileMap[14][9 + i] = WALL;
+	}
+}
+
+FMOD::Reverb3D *reverb1, *reverb2; //Variable global
+
+void createReverbs() {
+	reverb1 = LowLevelSystem::GetInstance()->CreateReverb();
+	reverb2 = LowLevelSystem::GetInstance()->CreateReverb();
+
+	//Propiedades de la reverb
+	FMOD_REVERB_PROPERTIES propR1 = FMOD_PRESET_CAVE; //Muchos más en FMOD_PRESET_
+	reverb1->setProperties(&propR1);
+
+	//Propiedades de la reverb
+	FMOD_REVERB_PROPERTIES propR2 = FMOD_PRESET_CONCERTHALL; //Muchos más en FMOD_PRESET_
+	reverb2->setProperties(&propR2);
+
+	//Posición y zonas de influencia
+	FMOD_VECTOR posReverb1 = { 18.0f, 0.0f, 10.0f };
+	float mindistR1 = 10.0f;//Escucha la reverb sin atenuación
+	float maxdistR1 = 20.0f;//Radio en el que escucha la reverb atenuandose
+	reverb1->set3DAttributes(&posReverb1, mindistR1, maxdistR1);
+
+	reverb1->setActive(true);
+
+	//Posición y zonas de influencia
+	FMOD_VECTOR posReverb2 = { 14.0f, 0.0f, 20.0f };
+	float mindistR2 = 10.0f;//Escucha la reverb sin atenuación
+	float maxdistR2 = 20.0f;//Radio en el que escucha la reverb atenuandose
+	reverb2->set3DAttributes(&posReverb2, mindistR2, maxdistR2);
+
+	//Puede activarse o desactivarse
+	reverb2->setActive(true);
+
+	tileMap[9][17] = REVERB1;
+	tileMap[19][11] = REVERB2;
+
+
+	//Afectan al canal por Channel::SetReverbProperties
+	//Se escuchará una mezcla ponderada de los reverb que afecten al listener
+
+	//TODO: COsas raras de reverb por convolución
 }
 
 void Hoja2()
@@ -368,13 +415,16 @@ void Hoja2()
 	//colocamos listener
 	lowLevelSystem->SetListener(0, listenerPos, listenerVel, up, at);
 
-	TileType tileMap[30][30];
-	createGeometry();
+
+
 
 	//Inicialización del TileMap
 	for (int i = 0; i < 30; i++)
 		for (int j = 0; j < 30; j++)
 			tileMap[i][j] = NONE;
+
+	createGeometry();
+	createReverbs();
 
 	tileMap[(int)listenerPos.z - 1][(int)listenerPos.x - 1] = LISTENER;
 
@@ -405,13 +455,17 @@ void Hoja2()
 	footstepSound->SetOutsideConeAngle(outsideConeAngle);
 	footstepSound->SetOutsideVolume(0.0f);
 
+
+	//Establecemos al canal que le afecten las reverb
+	footstepSound->SetReverbWet(1); //Afectada al máximo
+
 	footstepSound->Play();
 
 	//Para calcular la velocidad de una fuente de sonido utilizamos la posicion de la entidad
 	//vel.x = (pos.x - lastPos.x) * elapsed;
 
 
-	render(tileMap, minDistance, maxDistance, insideConeAngle, outsideConeAngle);
+	render(minDistance, maxDistance, insideConeAngle, outsideConeAngle);
 
 	while (true)
 	{
@@ -539,7 +593,7 @@ void Hoja2()
 				footstepSound->SetMaxDistance(maxDistance);
 			}
 
-			render(tileMap, minDistance, maxDistance, insideConeAngle, outsideConeAngle);
+			render( minDistance, maxDistance, insideConeAngle, outsideConeAngle);
 
 			//if ((key == 'Y') || (key == 'y'))
 			//{
@@ -551,6 +605,10 @@ void Hoja2()
 	}
 
 	delete footstepSound;
+
+	//Debe liberarse la reverb
+	reverb1->release();
+	reverb2->release();
 
 	LowLevelSystem::ResetInstance();
 }
