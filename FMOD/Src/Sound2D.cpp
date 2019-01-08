@@ -1,4 +1,4 @@
-#include "Sound.h"
+#include "Sound2D.h"
 #include "fmod_errors.h" // para manejo de errores
 
 
@@ -8,25 +8,29 @@ Samples: Efectos de sonido.
 Streams: Musica, pistas de voz, sonido ambiente.
 Comprimidos. Ocupan menos memoria
 */
-Sound::Sound(std::string name, FMOD_MODE mode = NULL, FMOD_CREATESOUNDEXINFO *exinfo = nullptr) {
+Sound2D::Sound2D(std::string name, FMOD_MODE mode = NULL, FMOD_CREATESOUNDEXINFO *exinfo = nullptr) {
 	_name = name;
 	currentState = SoundState::READY;
 
-	//?????
-	LowLevelSystem::ERRCHECK(channel->getFrequency(&_frequency)); //Inicializa el valor de frequency
+	Init(mode, exinfo);//Inicializamos el sonido 2D
+	_channel = LowLevelSystem::GetInstance()->CreateChannel(_sound);//TODO: AÑADIR CHANNEL GROUP
+
+	LowLevelSystem::ERRCHECK(_channel->getFrequency(&_frequency)); //Inicializa el valor de frequency
 
 }
 
-Sound::~Sound() {
+Sound2D::~Sound2D() {
 	LowLevelSystem::ERRCHECK(_sound->release());
 }
 
-
+void Sound2D::Init(FMOD_MODE mode = NULL, FMOD_CREATESOUNDEXINFO *exinfo = nullptr) {
+	_sound = LowLevelSystem::GetInstance()->Create2DSound(_name, mode, exinfo);
+}
 
 /// <summary>
 /// Reproduce el sonido
 /// </summary>
-void Sound::Play()
+void Sound2D::Play()
 {
 	CheckState();
 
@@ -34,7 +38,7 @@ void Sound::Play()
 		SetMSPosition(0);
 
 	else //PAUSE O READY
-		LowLevelSystem::ERRCHECK(channel->setPaused(false));
+		LowLevelSystem::ERRCHECK(_channel->setPaused(false));
 
 }
 #pragma region Flow
@@ -42,42 +46,42 @@ void Sound::Play()
 /// Para el sonido si está reproduciendose o pausado
 /// Se libera el canal 
 /// </summary>
-void Sound::Stop()
+void Sound2D::Stop()
 {
 	CheckState();
 
 	if (currentState != SoundState::READY)
-		LowLevelSystem::ERRCHECK(channel->stop());
+		LowLevelSystem::ERRCHECK(_channel->stop());
 }
 
 
 /// <summary>
 /// Pausa el sonido si está reproduciendose
 /// </summary>
-void Sound::Pause()
+void Sound2D::Pause()
 {
 	CheckState();
 
 	if (currentState == SoundState::PLAYING)
-		LowLevelSystem::ERRCHECK(channel->setPaused(true));
+		LowLevelSystem::ERRCHECK(_channel->setPaused(true));
 }
 
 /// <summary>
 /// Despausa el sonido si está pausado
 /// </summary>
-void Sound::Resume()
+void Sound2D::Resume()
 {
 	CheckState();
 
 	if (currentState == SoundState::PAUSED)
-		LowLevelSystem::ERRCHECK(channel->setPaused(false));
+		LowLevelSystem::ERRCHECK(_channel->setPaused(false));
 }
 
 /// <summary>
 /// Pausa el sonido si está reproduciendose y reanuda la pausa si estaba pausado
 ///TODO: COMPROBAR QUE FUNCIONA
 /// </summary>
-void Sound::TogglePaused()
+void Sound2D::TogglePaused()
 {
 	CheckState();
 
@@ -93,7 +97,7 @@ void Sound::TogglePaused()
 /// <summary>
 /// Actualiza el estado actual del sonido
 /// </summary>
-void Sound::CheckState() {
+void Sound2D::CheckState() {
 
 	switch (currentState) {
 	case SoundState::READY:
@@ -124,10 +128,10 @@ void Sound::CheckState() {
 /// Devuelve si el sonido está reproduciendose
 /// </summary>
 /// <returns></returns>
-bool Sound::IsPlaying()
+bool Sound2D::IsPlaying()
 {
 	bool isPlaying;
-	LowLevelSystem::ERRCHECK(channel->getPaused(&isPlaying));
+	LowLevelSystem::ERRCHECK(_channel->getPaused(&isPlaying));
 	return isPlaying;
 }
 
@@ -135,10 +139,10 @@ bool Sound::IsPlaying()
 /// Devuelve si el sonido está pausado
 /// </summary>
 /// <returns></returns>
-bool Sound::IsPaused()
+bool Sound2D::IsPaused()
 {
 	bool isPaused;
-	LowLevelSystem::ERRCHECK(channel->getPaused(&isPaused));
+	LowLevelSystem::ERRCHECK(_channel->getPaused(&isPaused));
 	return isPaused;
 }
 
@@ -146,10 +150,10 @@ bool Sound::IsPaused()
 /// Devuelve si el sonido ha acabado
 /// </summary>
 /// <returns></returns>
-bool Sound::HasEnded()
+bool Sound2D::HasEnded()
 {
 	bool playing;
-	return channel->isPlaying(&playing) == FMOD_ERR_INVALID_HANDLE;
+	return _channel->isPlaying(&playing) == FMOD_ERR_INVALID_HANDLE;
 }
 #pragma endregion  CheckStateMethods
 
@@ -159,11 +163,11 @@ bool Sound::HasEnded()
 /// Silencia el sonido o le pone volumen previo a ser muteado
 /// </summary>
 /// <param name="muted"></param>
-void Sound::SetMuted(bool muted)
+void Sound2D::SetMuted(bool muted)
 {
 	CheckState();
 	_mute = muted;
-	LowLevelSystem::ERRCHECK(channel->setMute(_mute));
+	LowLevelSystem::ERRCHECK(_channel->setMute(_mute));
 }
 
 
@@ -172,11 +176,11 @@ void Sound::SetMuted(bool muted)
 /// -1 para infinito | 0 una vez | 2 3 veces
 /// </summary>
 /// <param name="loop"></param>
-void Sound::SetLoopCount(int loopCount)
+void Sound2D::SetLoopCount(int loopCount)
 {
 	CheckState();
 	_loopCount = loopCount;
-	LowLevelSystem::ERRCHECK(channel->setLoopCount(loopCount));
+	LowLevelSystem::ERRCHECK(_channel->setLoopCount(loopCount));
 }
 
 /// <summary>
@@ -184,11 +188,11 @@ void Sound::SetLoopCount(int loopCount)
 /// Valor entre 0.0 y 1.0
 /// </summary>
 /// <param name="volume"></param>
-void Sound::SetVolume(float volume)
+void Sound2D::SetVolume(float volume)
 {
 	CheckState();
 	_volume = volume;
-	LowLevelSystem::ERRCHECK(channel->setVolume(_volume));
+	LowLevelSystem::ERRCHECK(_channel->setVolume(_volume));
 }
 
 
@@ -196,11 +200,11 @@ void Sound::SetVolume(float volume)
 /// Establece el pitch del sonido
 /// </summary>
 /// <param name="pitch"></param>
-void  Sound::SetPitch(float pitch)
+void  Sound2D::SetPitch(float pitch)
 {
 	CheckState();
 	_pitch = pitch;
-	LowLevelSystem::ERRCHECK(channel->setPitch(_pitch));
+	LowLevelSystem::ERRCHECK(_channel->setPitch(_pitch));
 }
 
 
@@ -208,11 +212,11 @@ void  Sound::SetPitch(float pitch)
 /// Establece la frecuencia del sonido
 /// </summary>
 /// <param name="newFrequency"></param>
-void Sound::SetFrequency(float newFrequency)
+void Sound2D::SetFrequency(float newFrequency)
 {
 	CheckState(); // 1.
 	_frequency = newFrequency; // 2.
-	LowLevelSystem::ERRCHECK(channel->setFrequency(_frequency)); // 3.
+	LowLevelSystem::ERRCHECK(_channel->setFrequency(_frequency)); // 3.
 	//4. reset
 }
 
@@ -220,10 +224,10 @@ void Sound::SetFrequency(float newFrequency)
 ///  Añade un DSP al canal
 /// </summary>
 /// <param name="newFrequency"></param>
-void Sound::AddDSP(FMOD::DSP* DSP) {
+void Sound2D::AddDSP(FMOD::DSP* DSP) {
 	CheckState();
 	DSPList.push_back(DSP);//Se añade a la lista de DSP
-	channel->addDSP(DSPList.size(), DSP); //Se añade el DSP al canal 
+	_channel->addDSP(DSPList.size(), DSP); //Se añade el DSP al canal 
 }
 
 /// <summary>
@@ -231,19 +235,19 @@ void Sound::AddDSP(FMOD::DSP* DSP) {
 /// -1 a la izquierda, 0 Centrado, 1 a la derecha
 /// </summary>
 /// <param name="newFrequency"></param>
-void Sound::SetPan(float pan) {
+void Sound2D::SetPan(float pan) {
 	CheckState();
 	_pan = pan;
-	LowLevelSystem::ERRCHECK(channel->setPan(pan));
+	LowLevelSystem::ERRCHECK(_channel->setPan(pan));
 }
 
 /// <summary>
 /// Establece la posición de reproducción de la pista en milisegundos
 /// </summary>
 /// <param name="position"></param>
-void Sound::SetMSPosition(int position)
+void Sound2D::SetMSPosition(int position)
 {
-	LowLevelSystem::ERRCHECK(channel->setPosition(position, FMOD_TIMEUNIT_MS));
+	LowLevelSystem::ERRCHECK(_channel->setPosition(position, FMOD_TIMEUNIT_MS));
 }
 
 #pragma endregion SetAtributtes
@@ -252,10 +256,10 @@ void Sound::SetMSPosition(int position)
 /// <summary>
 /// Crea un nuevo canal con los parámetros del anterior
 /// </summary>
-void Sound::ResetChannel()
+void Sound2D::ResetChannel()
 {
 	//channel->clearHandle();
-	channel = LowLevelSystem::GetInstance()->CreateChannel(_sound);
+	_channel = LowLevelSystem::GetInstance()->CreateChannel(_sound);
 	currentState = SoundState::READY;
 
 	SetFrequency(_frequency);
@@ -270,7 +274,7 @@ void Sound::ResetChannel()
 	//Se vuelven a añadir todos los efectos al canal
 	for (auto it = DSPList.begin(); it != DSPList.end(); ++it)
 	{
-		LowLevelSystem::ERRCHECK(channel->addDSP(i, (*it)));
+		LowLevelSystem::ERRCHECK(_channel->addDSP(i, (*it)));
 		i++;
 	}
 }
@@ -279,6 +283,6 @@ void Sound::ResetChannel()
 /// Controla el flujo de estados
 /// Además, si ha acabado un sonido, lo carga de nuevo
 /// </summary>
-void Sound::Update() {
+void Sound2D::Update() {
 	CheckState();
 }

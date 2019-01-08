@@ -2,9 +2,9 @@
 #include "fmod_errors.h" // para manejo de errores
 #include "LowLevelSystem.h"
 
-Sound3D::Sound3D(std::string name, FMOD_MODE mode = NULL, FMOD_CREATESOUNDEXINFO *exinfo = nullptr) : Sound(name){
+Sound3D::Sound3D(std::string name, FMOD_MODE mode = NULL, FMOD_CREATESOUNDEXINFO *exinfo = nullptr) : Sound2D(name){
 
-	LowLevelSystem::ERRCHECK(channel->get3DSpread(&_spread));
+	LowLevelSystem::ERRCHECK(_channel->get3DSpread(&_spread));
 
 	//Se inicializa la posicion a 0
 	_pos = new FMOD_VECTOR();
@@ -12,10 +12,12 @@ Sound3D::Sound3D(std::string name, FMOD_MODE mode = NULL, FMOD_CREATESOUNDEXINFO
 	_pos->y = 0;
 	_pos->z = 0;
 
-	_sound = LowLevelSystem::GetInstance()->Create3DSound(name, mode, exinfo);
 }
 
-Sound3D::~Sound3D() {
+Sound3D::~Sound3D() {} //Lla a la constructora padre para liberar el sonido
+
+void Sound3D::Init(FMOD_MODE mode, FMOD_CREATESOUNDEXINFO *exinfo) {
+	_sound = LowLevelSystem::GetInstance()->Create3DSound(_name, mode, exinfo);
 
 }
 
@@ -28,7 +30,7 @@ void Sound3D::SetPos(FMOD_VECTOR* pos) {
 	_pos->y = pos->y;
 	_pos->z = pos->z;
 
-	LowLevelSystem::ERRCHECK(channel->set3DAttributes(_pos, vel));
+	LowLevelSystem::ERRCHECK(_channel->set3DAttributes(_pos, vel));
 }
 
 
@@ -39,7 +41,7 @@ void Sound3D::SetPos(FMOD_VECTOR* pos) {
 void Sound3D::SetMinDistance(int min) {
 	CheckState();
 	_minDistance = min;
-	LowLevelSystem::ERRCHECK(channel->set3DMinMaxDistance(_minDistance, _maxDistance));
+	LowLevelSystem::ERRCHECK(_channel->set3DMinMaxDistance(_minDistance, _maxDistance));
 
 }
 
@@ -50,7 +52,7 @@ void Sound3D::SetMinDistance(int min) {
 void Sound3D::SetMaxDistance(int max) {
 	CheckState();
 	_maxDistance = max;
-	LowLevelSystem::ERRCHECK(channel->set3DMinMaxDistance(_minDistance, _maxDistance));
+	LowLevelSystem::ERRCHECK(_channel->set3DMinMaxDistance(_minDistance, _maxDistance));
 
 }
 
@@ -62,7 +64,7 @@ void Sound3D::SetReverbWet(float reverbWet)
 {
 	CheckState();
 	_reverbWet = reverbWet;
-	LowLevelSystem::ERRCHECK(channel->setReverbProperties(0, _reverbWet));
+	LowLevelSystem::ERRCHECK(_channel->setReverbProperties(0, _reverbWet));
 }
 
 
@@ -73,7 +75,7 @@ void Sound3D::SetReverbWet(float reverbWet)
 void Sound3D::SetInsideConeAngle(float insideConeAngle) {
 	CheckState();
 	_insideConeAngle = insideConeAngle;
-	LowLevelSystem::ERRCHECK(channel->set3DConeSettings(_insideConeAngle, _outsideConeAngle, _outsideVolume));
+	LowLevelSystem::ERRCHECK(_channel->set3DConeSettings(_insideConeAngle, _outsideConeAngle, _outsideVolume));
 
 }
 
@@ -85,7 +87,7 @@ void Sound3D::SetInsideConeAngle(float insideConeAngle) {
 void Sound3D::SetOutsideConeAngle(float outsideConeAngle) {
 	CheckState();
 	_outsideConeAngle = outsideConeAngle;
-	LowLevelSystem::ERRCHECK(channel->set3DConeSettings(_insideConeAngle, _outsideConeAngle, _outsideVolume));
+	LowLevelSystem::ERRCHECK(_channel->set3DConeSettings(_insideConeAngle, _outsideConeAngle, _outsideVolume));
 
 }
 
@@ -96,7 +98,7 @@ void Sound3D::SetOutsideConeAngle(float outsideConeAngle) {
 void Sound3D::SetOutsideVolume(float outsideVolume) {
 	CheckState();
 	_outsideVolume = outsideVolume;
-	LowLevelSystem::ERRCHECK(channel->set3DConeSettings(_insideConeAngle, _outsideConeAngle, _outsideVolume));
+	LowLevelSystem::ERRCHECK(_channel->set3DConeSettings(_insideConeAngle, _outsideConeAngle, _outsideVolume));
 
 }
 
@@ -111,11 +113,11 @@ void Sound3D::Set3DSpread(float degrees)
 {
 	CheckState();
 	_spread = degrees;
-	LowLevelSystem::ERRCHECK(channel->set3DSpread(_spread));
+	LowLevelSystem::ERRCHECK(_channel->set3DSpread(_spread));
 }
 
 void Sound3D::ResetChannel() {
-	Sound::ResetChannel();//Llamada al método de Sound
+	Sound2D::ResetChannel();//Llamada al método de Sound
 	SetPos(_pos);
 	SetMinDistance(_minDistance);
 	SetMaxDistance(_maxDistance);
