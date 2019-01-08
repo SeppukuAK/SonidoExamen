@@ -1,5 +1,5 @@
-#ifndef __Sound_h_
-#define __Sound_h_
+#ifndef __Sound2D_h_
+#define __Sound2D_h_
 #include <list>
 #include "fmod.hpp"
 #include "LowLevelSystem.h"
@@ -9,7 +9,7 @@
 /// Controla parámetros del canal de reproducción
 /// Tiene una posición en el espacio
 /// </summary>
-class Sound {
+class Sound2D {
 private:
 	enum SoundState { READY, PLAYING, PAUSED };
 
@@ -28,14 +28,13 @@ private:
 	/// Estado actual de la reproducción
 	SoundState currentState;
 
-	/// nombre del archivo de audio
-	std::string _name;
+
 
 public:
 
 	
-	Sound(std::string name, FMOD_MODE mode = NULL, FMOD_CREATESOUNDEXINFO *exinfo = nullptr);
-	virtual ~Sound();
+	Sound2D(std::string name, FMOD_MODE mode = NULL, FMOD_CREATESOUNDEXINFO *exinfo = nullptr);
+	virtual ~Sound2D();
 
 	//Métodos de comprobación de estado
 	bool IsPlaying();
@@ -84,15 +83,20 @@ protected:
 	/// <summary>
 	/// Controla parámetros del canal
 	/// </summary>
-	FMOD::Channel* channel;
+	FMOD::Channel* _channel;
 
 	/// <summary>
 	/// Unifica el tratamiento de los diferentes formatos de sonido
 	/// </summary>
 	FMOD::Sound* _sound;
 
+	/// nombre del archivo de audio
+	std::string _name;
 
 	//Métodos
+
+	virtual void Init(FMOD_MODE mode, FMOD_CREATESOUNDEXINFO *exinfo);
+
 
 	/// <summary>
 	/// Actualiza el estado actual del sonido
