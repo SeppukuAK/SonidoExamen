@@ -81,6 +81,25 @@ void Sound::TogglePaused()
 		Resume();
 }
 
+void Sound::FadeIn(float time, float volume) {
+	unsigned long long dspclock;
+	LowLevelSystem::ERRCHECK(_channel->getDSPClock(0, &dspclock));
+	int rate;
+	LowLevelSystem::ERRCHECK(LowLevelSystem::GetInstance()->GetSystem()->getSoftwareFormat(&rate, 0, 0));                // Get mixer rate
+
+	_channel->addFadePoint(dspclock + (rate * time), volume);    // Add a fade point 5 seconds later at 0 volume.
+}
+
+void Sound::FadeOut(float time, float volume)
+{
+	unsigned long long dspclock;
+	LowLevelSystem::ERRCHECK(_channel->getDSPClock(0, &dspclock));
+	int rate;
+	LowLevelSystem::ERRCHECK(LowLevelSystem::GetInstance()->GetSystem()->getSoftwareFormat(&rate, 0, 0));                // Get mixer rate
+
+	//_channel->addFadePoint(dspclock, 1.0f);                 // Add a fade point at 'now' with full volume.
+	_channel->addFadePoint(dspclock + (rate * time), volume);    // Add a fade point 5 seconds later at 0 volume.
+}
 #pragma endregion
 
 

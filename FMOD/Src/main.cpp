@@ -1,6 +1,8 @@
 ﻿#include "fmod.hpp"
 #include "LowLevelSystem.h"
 #include "Sound3D.h"
+#include "Sound2D.h"
+
 #include <conio.h>
 
 //Ejemplo de un pequeño reproductor
@@ -8,7 +10,7 @@ void SimplePlayer()
 {
 	LowLevelSystem::GetInstance();
 
-	Sound3D * sound3D = new Sound3D("Battle.wav");
+	Sound2D * sound3D = new Sound2D("Battle.wav");
 	sound3D->Play();
 	printf("[P] Pausar/Despausar\n[V/v] Subir/bajar volumen\n[Q] Salir\n");
 
@@ -18,9 +20,20 @@ void SimplePlayer()
 		if (_kbhit())
 		{
 			int key = _getch();
+
+			//PAUSAR SONIDO
 			if ((key == 'P') || (key == 'p'))
 				sound3D->TogglePaused();
 
+			//PARAR SONIDO
+			else if (key == 'S' || key == 's')
+				sound3D->Stop();
+
+			//REPRODUCIR SONIDO
+			else if (key == 'R' || key == 'r')
+				sound3D->Play();
+
+			//SUBIR VOLUMEN
 			else if (key == 'V' || key == 'v')
 			{
 				if (volume < 1.0)
@@ -30,7 +43,7 @@ void SimplePlayer()
 					printf("Volume: %f\n", volume);
 				}
 			}
-
+			//BAJAR VOLUMEN
 			else if (key == 'B' || key == 'b')
 			{
 				if (volume > 0)
@@ -40,6 +53,31 @@ void SimplePlayer()
 					printf("Volume: %f\n", volume);
 				}
 			}
+			//FADE IN
+			else if (key == 'A' || key == 'a')
+			{
+
+				float time = 2.0;
+				float volumeFadeIn = 0.7;
+				sound3D->FadeIn(time, volumeFadeIn);
+				printf("Fade in after %f seconds\n", time);
+			}
+			//FADE OUT
+			else if (key == 'Z' || key == 'z')
+			{
+
+				float time = 2.0;
+				float volumeFadeOut = 0.2;
+				sound3D->FadeOut(time, volumeFadeOut);
+				printf("Fade out after %f seconds\n", time);
+			}
+			//PAN -1 Izq, O por defecto, 1 derecha
+			else if (key == 'N' || key == 'n') {
+				int n = -1.0;
+				sound3D->SetPan(n);
+				printf("Pan: %f\n ", n);
+			}
+			//SALIR DE LA APLICACIÓN
 			else if ((key == 'Q') || (key == 'q'))
 				break;
 

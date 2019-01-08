@@ -32,6 +32,7 @@ public:
 	LowLevelSystem();
 	~LowLevelSystem();
 
+	inline FMOD::System* GetSystem() { return system; };
 	void SetListener(int listener, FMOD_VECTOR pos, FMOD_VECTOR vel, FMOD_VECTOR up, FMOD_VECTOR at);
 	void SetNumListeners(int num);
 

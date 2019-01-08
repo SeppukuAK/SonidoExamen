@@ -68,6 +68,9 @@ public:
 	/// </summary>
 	void Resume();
 
+	void FadeIn(float time, float volume);
+	void FadeOut(float time, float volume);
+
 	void TogglePaused();
 
 
