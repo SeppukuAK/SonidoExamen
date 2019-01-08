@@ -18,6 +18,8 @@ private:
 	float _outsideConeAngle = 360.0;
 	float _outsideVolume = 1.0;
 
+	float _spread;
+
 	float _reverbWet;
 
 	FMOD_VECTOR *_pos;
@@ -31,10 +33,13 @@ private:
 	void SetInsideConeAngle(float insideConeAngle);
 	void SetOutsideConeAngle(float outsideConeAngle);
 	void SetOutsideVolume(float outsideVolume);
+
+	void Set3DSpread(float degrees);
+
 	void ResetChannel();
 
 public:
-	Sound3D(std::string _name);
+	Sound3D(std::string _name, FMOD_MODE mode = NULL, FMOD_CREATESOUNDEXINFO *exinfo = nullptr);
 	~Sound3D();
 
 };

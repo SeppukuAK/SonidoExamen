@@ -1,4 +1,4 @@
-#include "LowLevelSystem.h"
+﻿#include "LowLevelSystem.h"
 
 using namespace std;
 using namespace FMOD;
@@ -25,7 +25,7 @@ void LowLevelSystem::ResetInstance() {
 
 
 /// <summary>
-/// Creaci�n del LowLevelSystem
+/// Creación del LowLevelSystem
 /// </summary>
 LowLevelSystem::LowLevelSystem()
 {
@@ -44,6 +44,18 @@ LowLevelSystem::~LowLevelSystem()
 	ERRCHECK(system->release());
 }
 
+//listener que se modifica. 0 el por defecto
+void LowLevelSystem::SetListener(int listener, FMOD_VECTOR pos, FMOD_VECTOR vel, FMOD_VECTOR up, FMOD_VECTOR at)
+{
+	ERRCHECK(system->set3DListenerAttributes(0, &pos, &vel, &up, &at));
+}
+
+//Establece el número de listeners
+void LowLevelSystem::SetNumListeners(int num)
+{
+	ERRCHECK(system->set3DNumListeners(num));
+}
+
 /// <summary>
 /// Update del system. 
 /// </summary>
@@ -52,12 +64,13 @@ void LowLevelSystem::Update()
 	ERRCHECK(system->update());
 }
 
-// <summary>
+/// <summary>
 /// Crea un sonido 2D
+/// Se le puede pasar información adicional
 /// </summary>
 /// <param name="name"></param>
 /// <returns></returns>
-Sound* LowLevelSystem::Create2DSound(string name)
+Sound* LowLevelSystem::Create2DSound(string name, FMOD_MODE mode = NULL, FMOD_CREATESOUNDEXINFO *exinfo = nullptr)
 {
 	Sound * sound = nullptr;
 
@@ -65,7 +78,7 @@ Sound* LowLevelSystem::Create2DSound(string name)
 	strcpy_s(aux, AUDIOPATH); // copy string one into the result.
 	strcat_s(aux, sizeof aux, name.c_str());
 
-	ERRCHECK(system->createSound(aux, FMOD_2D | FMOD_LOOP_NORMAL, 0, &sound));
+	ERRCHECK(system->createSound(aux, FMOD_2D | FMOD_LOOP_NORMAL | mode, exinfo, &sound));
 
 	return sound;
 }
@@ -75,34 +88,36 @@ Sound* LowLevelSystem::Create2DSound(string name)
 /// </summary>
 /// <param name="name"></param>
 /// <returns></returns>
-Sound* LowLevelSystem::Create3DSound(string name)
+Sound* LowLevelSystem::Create3DSound(string name, FMOD_MODE mode = NULL, FMOD_CREATESOUNDEXINFO *exinfo = nullptr)
 {
 	Sound * sound = nullptr;
 
+	//TODO: REVISAR
+	//const char * a = AUDIOPATH + *name;
 	char aux[100];
 	strcpy_s(aux, AUDIOPATH); // copy string one into the result.
 	strcat_s(aux, sizeof aux, name.c_str());
 
-	ERRCHECK(system->createSound(aux, FMOD_3D | FMOD_LOOP_NORMAL, 0, &sound));
+	ERRCHECK(system->createSound(aux, FMOD_3D | FMOD_LOOP_NORMAL | mode, exinfo, &sound));
 
 	return sound;
 }
 
 
 /// <summary>
-   /// Crea un canal asociado al sonido
-   /// Arranca en pause para dejarlo disponible en memoria
-   /// </summary>
-   /// <param name="sound"></param>
-   /// <returns></returns>
-Channel* LowLevelSystem::CreateChannel(Sound *sound)
+/// Crea un canal asociado al sonido
+/// Arranca en pause para dejarlo disponible en memoria
+/// </summary>
+/// <param name="sound"></param>
+/// <returns></returns>
+Channel* LowLevelSystem::CreateChannel(Sound *sound, ChannelGroup * channelGroup = nullptr)
 {
 	Channel *channel = nullptr;
 
 	//Se crea el canal
 	ERRCHECK(system->playSound(
 		sound,
-		0, // grupo de canales, 0 sin agrupar (agrupado en el master)
+		channelGroup, // grupo de canales, 0 sin agrupar (agrupado en el master)
 		true, // arranca con "pause" 
 		&channel));
 

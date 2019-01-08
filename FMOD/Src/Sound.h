@@ -33,7 +33,8 @@ private:
 
 public:
 
-	Sound(std::string name);
+	
+	Sound(std::string name, FMOD_MODE mode = NULL, FMOD_CREATESOUNDEXINFO *exinfo = nullptr);
 	virtual ~Sound();
 
 	//Métodos de comprobación de estado
@@ -50,7 +51,7 @@ public:
 	void AddDSP(FMOD::DSP *DSP);
 	void SetPan(float pan);
 	void SetMSPosition(int position);
-
+	//TODO: SetMixLevelsOutput: diapo 18
 
 	/// <summary>
 	/// Reproduce el sonido
@@ -73,7 +74,7 @@ public:
 	/// </summary>
 	void Resume();
 
-
+	void TogglePaused();
 
 
 protected:

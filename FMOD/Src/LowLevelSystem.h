@@ -7,6 +7,7 @@
 /// <summary>
 /// Motor de audio que permite el posicionamiento 3D, geometría y reverbs
 /// Inicializa la librería. Se encarga de cargar y reproducir sonidos.
+/// Controla el Listener
 /// </summary>
 class LowLevelSystem
 {
@@ -40,15 +41,18 @@ public:
 	LowLevelSystem();
 	~LowLevelSystem();
 
+	void SetListener(int listener, FMOD_VECTOR pos, FMOD_VECTOR vel, FMOD_VECTOR up, FMOD_VECTOR at);
+	void SetNumListeners(int num);
+
 	/// <summary>
 	/// Update del system. 
 	/// </summary>
 	void Update();
 
-	FMOD::Sound* Create2DSound(std::string name);
-	FMOD::Sound* Create3DSound(std::string name);
+	FMOD::Sound* Create2DSound(std::string name, FMOD_MODE mode = NULL, FMOD_CREATESOUNDEXINFO *exinfo = nullptr);
+	FMOD::Sound* Create3DSound(std::string name, FMOD_MODE mode = NULL, FMOD_CREATESOUNDEXINFO *exinfo = nullptr);
 
-	FMOD::Channel* CreateChannel(FMOD::Sound *sound);
+	FMOD::Channel* CreateChannel(FMOD::Sound *sound, FMOD::ChannelGroup * channelGroup = nullptr);
 	//TODO: CHANNEL GROUP
 	FMOD::Reverb3D* CreateReverb();
 	FMOD::Geometry* CreateGeometry(int maxPoligons, int maxVertex);

@@ -2,15 +2,17 @@
 #include "fmod_errors.h" // para manejo de errores
 #include "LowLevelSystem.h"
 
-Sound3D::Sound3D(std::string name) : Sound(name){
+Sound3D::Sound3D(std::string name, FMOD_MODE mode = NULL, FMOD_CREATESOUNDEXINFO *exinfo = nullptr) : Sound(name){
+
+	LowLevelSystem::ERRCHECK(channel->get3DSpread(&_spread));
+
 	//Se inicializa la posicion a 0
 	_pos = new FMOD_VECTOR();
 	_pos->x = 0;
 	_pos->y = 0;
 	_pos->z = 0;
 
-
-	_sound = LowLevelSystem::GetInstance()->Create3DSound(name);
+	_sound = LowLevelSystem::GetInstance()->Create3DSound(name, mode, exinfo);
 }
 
 Sound3D::~Sound3D() {
@@ -97,6 +99,21 @@ void Sound3D::SetOutsideVolume(float outsideVolume) {
 	LowLevelSystem::ERRCHECK(channel->set3DConeSettings(_insideConeAngle, _outsideConeAngle, _outsideVolume));
 
 }
+
+/*
+	Posiciona en 3D un sonido estereo.
+	Se separa en 2 voces mono. Controla su amplitud
+	0º suena en mono.
+	90º: canal izquierdo 45º, canal derecho 45º
+	360º: sonido mono situado en la posición opuesta
+*/
+void Sound3D::Set3DSpread(float degrees)
+{
+	CheckState();
+	_spread = degrees;
+	LowLevelSystem::ERRCHECK(channel->set3DSpread(_spread));
+}
+
 void Sound3D::ResetChannel() {
 	Sound::ResetChannel();//Llamada al método de Sound
 	SetPos(_pos);

@@ -2,8 +2,13 @@
 #include "fmod_errors.h" // para manejo de errores
 
 
-
-Sound::Sound(std::string name) {
+/*
+Por defecto son samples. Puede pasarse que sean Streams o Samples Comprimidos.
+Samples: Efectos de sonido.
+Streams: Musica, pistas de voz, sonido ambiente.
+Comprimidos. Ocupan menos memoria
+*/
+Sound::Sound(std::string name, FMOD_MODE mode = NULL, FMOD_CREATESOUNDEXINFO *exinfo = nullptr) {
 	_name = name;
 	currentState = SoundState::READY;
 
@@ -67,6 +72,21 @@ void Sound::Resume()
 	if (currentState == SoundState::PAUSED)
 		LowLevelSystem::ERRCHECK(channel->setPaused(false));
 }
+
+/// <summary>
+/// Pausa el sonido si está reproduciendose y reanuda la pausa si estaba pausado
+///TODO: COMPROBAR QUE FUNCIONA
+/// </summary>
+void Sound::TogglePaused()
+{
+	CheckState();
+
+	if (currentState == SoundState::PLAYING)
+		Pause();
+	else
+		Resume();
+}
+
 #pragma endregion
 
 
@@ -208,6 +228,7 @@ void Sound::AddDSP(FMOD::DSP* DSP) {
 
 /// <summary>
 /// Establece la panorámica del sound 
+/// -1 a la izquierda, 0 Centrado, 1 a la derecha
 /// </summary>
 /// <param name="newFrequency"></param>
 void Sound::SetPan(float pan) {
