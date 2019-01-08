@@ -48,6 +48,58 @@ public:
 	FMOD::Geometry* CreateGeometry(int maxPoligons, int maxVertex);
 	FMOD::DSP* CreateDSPByType(FMOD_DSP_TYPE DSPType);
 
+#pragma region LISTENER_PARAMETERS
+
+	FMOD_VECTOR GetListenerPos(int listener)
+	{
+		FMOD_VECTOR pos, vel, forward, up;
+		ERRCHECK(system->get3DListenerAttributes(listener, &pos, &vel,&forward,&up));
+		return pos;
+	}
+
+	FMOD_VECTOR GetListenerVel(int listener)
+	{
+		FMOD_VECTOR pos, vel, forward, up;
+		ERRCHECK(system->get3DListenerAttributes(listener, &pos, &vel, &forward, &up));
+		return vel;
+	}
+
+	FMOD_VECTOR GetListenerForward(int listener)
+	{
+		FMOD_VECTOR pos, vel, forward, up;
+		ERRCHECK(system->get3DListenerAttributes(listener, &pos, &vel, &forward, &up));
+		return forward;
+	}
+
+	FMOD_VECTOR GetListenerUp(int listener)
+	{
+		FMOD_VECTOR pos, vel, forward, up;
+		ERRCHECK(system->get3DListenerAttributes(listener, &pos, &vel, &forward, &up));
+		return up;
+	}
+
+	void SetListenerPos(int listener, FMOD_VECTOR pos)
+	{
+		SetListener(listener,pos,GetListenerVel(listener), GetListenerForward(listener), GetListenerUp(listener));
+	}
+
+	void SetListenerVel(int listener, FMOD_VECTOR vel)
+	{
+		SetListener(listener, GetListenerPos(listener), vel, GetListenerForward(listener), GetListenerUp(listener));
+	}
+
+	void SetListenerForward(int listener, FMOD_VECTOR forward)
+	{
+		SetListener(listener, GetListenerPos(listener), GetListenerVel(listener), forward, GetListenerUp(listener));
+	}
+
+	void SetListenerUp(int listener, FMOD_VECTOR up)
+	{
+		SetListener(listener, GetListenerPos(listener), GetListenerVel(listener), GetListenerForward(listener), up);
+	}
+
+#pragma endregion LISTENER_PARAMETERS
+
 #pragma region SYSTEM_PARAMETERS
 
 	//Devuelve la variación de frecuencia por la velocidad

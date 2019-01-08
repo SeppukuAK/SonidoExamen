@@ -1,103 +1,78 @@
 #include "Sound3D.h"
-#include "fmod_errors.h" // para manejo de errores
 #include "LowLevelSystem.h"
 
-Sound3D::Sound3D(std::string name, FMOD_MODE mode, FMOD_CREATESOUNDEXINFO *exinfo) : Sound(name){
+Sound3D::Sound3D(std::string name, FMOD_MODE mode, FMOD_CREATESOUNDEXINFO *exinfo) : Sound(name) {
 
 	_sound = LowLevelSystem::GetInstance()->Create3DSound(_name, mode, exinfo);
 	_channel = LowLevelSystem::GetInstance()->CreateChannel(_sound);
 
-	//Se inicializa la posicion a 0
-	_pos = new FMOD_VECTOR();
-	_pos->x = 0;
-	_pos->y = 0;
-	_pos->z = 0;
-
 	LowLevelSystem::ERRCHECK(_channel->getFrequency(&_frequency)); //Inicializa el valor de frequency
 	LowLevelSystem::ERRCHECK(_channel->get3DSpread(&_spread));
+	LowLevelSystem::ERRCHECK(_channel->get3DAttributes(&_pos, nullptr));
+	LowLevelSystem::ERRCHECK(_channel->get3DConeOrientation(&_dir));
 }
 
 Sound3D::~Sound3D() {} //Lla a la constructora padre para liberar el sonido
 
-void Sound3D::SetPos(FMOD_VECTOR* pos) {
-	FMOD_VECTOR *vel = 0;
-
+//Establece la posición del sonido
+void Sound3D::SetPos(FMOD_VECTOR pos) {
 	CheckState();
 
-	_pos->x = pos->x;
-	_pos->y = pos->y;
-	_pos->z = pos->z;
+	_pos.x = pos.x;
+	_pos.y = pos.y;
+	_pos.z = pos.z;
 
-	LowLevelSystem::ERRCHECK(_channel->set3DAttributes(_pos, vel));
+	LowLevelSystem::ERRCHECK(_channel->set3DAttributes(&_pos, nullptr));
 }
 
-
-/// <summary>
-/// Establece la Distancia a partir de la cual el sonido empieza a atenuarse
-/// </summary>
-/// <param name="minDistance"></param>
-void Sound3D::SetMinDistance(int min) {
+// Establece la Distancia a partir de la cual el sonido empieza a atenuarse
+void Sound3D::SetMinDistance(float min) {
 	CheckState();
 	_minDistance = min;
 	LowLevelSystem::ERRCHECK(_channel->set3DMinMaxDistance(_minDistance, _maxDistance));
-
 }
 
-/// <summary>
-/// Establece la Distancia a partir de la cual el sonido no se atenúa más
-/// </summary>
-/// <param name="maxDistance"></param>
-void Sound3D::SetMaxDistance(int max) {
+//Establece la Distancia a partir de la cual el sonido no se atenúa más
+void Sound3D::SetMaxDistance(float max) {
 	CheckState();
 	_maxDistance = max;
 	LowLevelSystem::ERRCHECK(_channel->set3DMinMaxDistance(_minDistance, _maxDistance));
-
 }
 
-/// <summary>
-/// Establece el reverWet
-/// </summary>
-/// <param name="maxDistance"></param>
+//Establece la dirección del cono
+void Sound3D::SetConeOrientation(FMOD_VECTOR dir) {
+	CheckState();
+	_dir = dir;
+	LowLevelSystem::ERRCHECK(_channel->set3DConeOrientation(&_dir));
+}
+
+// Establece el angulo del cono interior: donde no hay atenuación por dirección
+void Sound3D::SetInsideConeAngle(float insideConeAngle) {
+	CheckState();
+	_insideConeAngle = insideConeAngle;
+	LowLevelSystem::ERRCHECK(_channel->set3DConeSettings(_insideConeAngle, _outsideConeAngle, _outsideVolume));
+}
+
+// Establece el ángulo del cono exterior: donde el sonido se atenúa
+void Sound3D::SetOutsideConeAngle(float outsideConeAngle) {
+	CheckState();
+	_outsideConeAngle = outsideConeAngle;
+	LowLevelSystem::ERRCHECK(_channel->set3DConeSettings(_insideConeAngle, _outsideConeAngle, _outsideVolume));
+}
+
+//Establece el volumen fuera del cono exterior
+void Sound3D::SetOutsideVolume(float outsideVolume) {
+	CheckState();
+	_outsideVolume = outsideVolume;
+	LowLevelSystem::ERRCHECK(_channel->set3DConeSettings(_insideConeAngle, _outsideConeAngle, _outsideVolume));
+}
+
+//Establece el reverWet
 void Sound3D::SetReverbWet(float reverbWet)
 {
 	CheckState();
 	_reverbWet = reverbWet;
 	LowLevelSystem::ERRCHECK(_channel->setReverbProperties(0, _reverbWet));
-}
-
-
-/// <summary>
-/// Establece el angulo del cono interior: donde no hay atenuación por dirección
-/// </summary>
-/// <param name="insideConeAngle"></param>
-void Sound3D::SetInsideConeAngle(float insideConeAngle) {
-	CheckState();
-	_insideConeAngle = insideConeAngle;
-	LowLevelSystem::ERRCHECK(_channel->set3DConeSettings(_insideConeAngle, _outsideConeAngle, _outsideVolume));
-
-}
-
-
-/// <summary>
-/// Establece el ángulo del cono exterior: donde el sonido se atenúa
-/// </summary>
-/// <param name="insideConeAngle"></param>
-void Sound3D::SetOutsideConeAngle(float outsideConeAngle) {
-	CheckState();
-	_outsideConeAngle = outsideConeAngle;
-	LowLevelSystem::ERRCHECK(_channel->set3DConeSettings(_insideConeAngle, _outsideConeAngle, _outsideVolume));
-
-}
-
-/// <summary>
-/// Establece el volumen fuera del cono exterior
-/// </summary>
-/// <param name="insideConeAngle"></param>
-void Sound3D::SetOutsideVolume(float outsideVolume) {
-	CheckState();
-	_outsideVolume = outsideVolume;
-	LowLevelSystem::ERRCHECK(_channel->set3DConeSettings(_insideConeAngle, _outsideConeAngle, _outsideVolume));
-
 }
 
 /*
@@ -119,8 +94,10 @@ void Sound3D::ResetChannel() {
 	SetPos(_pos);
 	SetMinDistance(_minDistance);
 	SetMaxDistance(_maxDistance);
-	SetReverbWet(_reverbWet);
+	SetConeOrientation(_dir);
 	SetInsideConeAngle(_insideConeAngle);
 	SetOutsideConeAngle(_outsideConeAngle);
 	SetOutsideVolume(_outsideVolume);
+	SetReverbWet(_reverbWet);
+	Set3DSpread(_spread);
 }

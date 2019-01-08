@@ -7,9 +7,9 @@
 	doubleSided; // atenua por ambos lados o no
 	Se crea a geometria del cubo
 */
-AudioGeometry::AudioGeometry(int maxPoligons, int maxVertex, float directOcclusion, float reverbOcclusion, bool doubleSided, FMOD_VECTOR poligons[])
+AudioGeometry::AudioGeometry(int maxPoligons, int maxVertex, float directOcclusion, float reverbOcclusion, bool doubleSided, FMOD_VECTOR * poligons)
 {
-	geometry = LowLevelSystem::GetInstance()->CreateGeometry(maxPoligons, maxVertex);
+	geometry = LowLevelSystem::GetInstance()->CreateGeometry(maxPoligons, maxPoligons * maxVertex);
 
 	int polygonIndex; // Indice al poligono generado para referenciarlo despues
 	for (int i = 0; i < maxPoligons; i++)

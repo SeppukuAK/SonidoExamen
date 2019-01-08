@@ -56,8 +56,7 @@ public:
 
 	//Efectos sobre la reproducción del canal
 	void SetMSPosition(int position);
-	void FadeIn(float time, float volume);
-	void FadeOut(float time, float volume);
+	void Fade(float time, float volume);
 
 protected:
 	virtual void ResetChannel();

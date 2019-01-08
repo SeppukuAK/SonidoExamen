@@ -166,28 +166,23 @@ void Sound::AddDSP(FMOD::DSP* DSP) {
 
 #pragma region ChannelEffects
 
-void Sound::FadeIn(float time, float volume) {
+void Sound::Fade(float time, float volume) {
+	CheckState();
 	unsigned long long dspclock;
 	LowLevelSystem::ERRCHECK(_channel->getDSPClock(0, &dspclock));
 	int rate;
 	LowLevelSystem::ERRCHECK(LowLevelSystem::GetInstance()->GetSystem()->getSoftwareFormat(&rate, 0, 0));                // Get mixer rate
 
-	_channel->addFadePoint(dspclock + (rate * time), volume);    // Add a fade point 5 seconds later at 0 volume.
-}
+	LowLevelSystem::ERRCHECK(_channel->addFadePoint(dspclock, _volume));    // Add a fade point 5 seconds later at 0 volume.
+	LowLevelSystem::ERRCHECK(_channel->addFadePoint(dspclock + (rate * time), volume));    // Add a fade point 5 seconds later at 0 volume.
 
-void Sound::FadeOut(float time, float volume)
-{
-	unsigned long long dspclock;
-	LowLevelSystem::ERRCHECK(_channel->getDSPClock(0, &dspclock));
-	int rate;
-	LowLevelSystem::ERRCHECK(LowLevelSystem::GetInstance()->GetSystem()->getSoftwareFormat(&rate, 0, 0));                // Get mixer rate
-
-	_channel->addFadePoint(dspclock + (rate * time), volume);    // Add a fade point 5 seconds later at 0 volume.
+	_volume = volume;
 }
 
 // Establece la posición de reproducción de la pista en milisegundos
 void Sound::SetMSPosition(int position)
 {
+	CheckState();
 	LowLevelSystem::ERRCHECK(_channel->setPosition(position, FMOD_TIMEUNIT_MS));
 }
 
