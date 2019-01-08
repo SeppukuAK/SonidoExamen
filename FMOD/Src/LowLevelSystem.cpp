@@ -63,7 +63,7 @@ void LowLevelSystem::Update()
 
 //Crea un sonido 2D
 //Se le puede pasar información adicional
-Sound* LowLevelSystem::Create2DSound(string name, FMOD_MODE mode = NULL, FMOD_CREATESOUNDEXINFO *exinfo = nullptr)
+Sound* LowLevelSystem::Create2DSound(string name, FMOD_MODE mode, FMOD_CREATESOUNDEXINFO *exinfo)
 {
 	Sound * sound = nullptr;
 
@@ -78,7 +78,7 @@ Sound* LowLevelSystem::Create2DSound(string name, FMOD_MODE mode = NULL, FMOD_CR
 
 //Crea un sonido 3D
 //Se le puede pasar información adicional
-Sound* LowLevelSystem::Create3DSound(string name, FMOD_MODE mode = NULL, FMOD_CREATESOUNDEXINFO *exinfo = nullptr)
+Sound* LowLevelSystem::Create3DSound(string name, FMOD_MODE mode, FMOD_CREATESOUNDEXINFO *exinfo)
 {
 	Sound * sound = nullptr;
 
@@ -95,7 +95,7 @@ Sound* LowLevelSystem::Create3DSound(string name, FMOD_MODE mode = NULL, FMOD_CR
 
 //Crea un canal asociado al sonido
 //Arranca en pause para dejarlo disponible en memoria
-Channel* LowLevelSystem::CreateChannel(Sound *sound, ChannelGroup * channelGroup = nullptr)
+Channel* LowLevelSystem::CreateChannel(Sound *sound, ChannelGroup * channelGroup)
 {
 	Channel *channel = nullptr;
 

@@ -1,0 +1,278 @@
+#include "Sound.h"
+#include "fmod_errors.h" // para manejo de errores
+
+
+/*
+Por defecto son samples. Puede pasarse que sean Streams o Samples Comprimidos.
+Samples: Efectos de sonido.
+Streams: Musica, pistas de voz, sonido ambiente.
+Comprimidos. Ocupan menos memoria
+*/
+Sound::Sound(std::string name, FMOD_MODE mode, FMOD_CREATESOUNDEXINFO *exinfo) {
+	_name = name;
+	currentState = SoundState::READY;
+}
+
+Sound::~Sound() {
+	LowLevelSystem::ERRCHECK(_sound->release());
+}
+
+/// <summary>
+/// Reproduce el sonido
+/// </summary>
+void Sound::Play()
+{
+	CheckState();
+
+	if (currentState == SoundState::PLAYING)
+		SetMSPosition(0);
+
+	else //PAUSE O READY
+		LowLevelSystem::ERRCHECK(_channel->setPaused(false));
+
+}
+#pragma region Flow
+/// <summary>
+/// Para el sonido si está reproduciendose o pausado
+/// Se libera el canal 
+/// </summary>
+void Sound::Stop()
+{
+	CheckState();
+
+	if (currentState != SoundState::READY)
+		LowLevelSystem::ERRCHECK(_channel->stop());
+}
+
+
+/// <summary>
+/// Pausa el sonido si está reproduciendose
+/// </summary>
+void Sound::Pause()
+{
+	CheckState();
+
+	if (currentState == SoundState::PLAYING)
+		LowLevelSystem::ERRCHECK(_channel->setPaused(true));
+}
+
+/// <summary>
+/// Despausa el sonido si está pausado
+/// </summary>
+void Sound::Resume()
+{
+	CheckState();
+
+	if (currentState == SoundState::PAUSED)
+		LowLevelSystem::ERRCHECK(_channel->setPaused(false));
+}
+
+/// <summary>
+/// Pausa el sonido si está reproduciendose y reanuda la pausa si estaba pausado
+///TODO: COMPROBAR QUE FUNCIONA
+/// </summary>
+void Sound::TogglePaused()
+{
+	CheckState();
+
+	if (currentState == SoundState::PLAYING)
+		Pause();
+	else
+		Resume();
+}
+
+#pragma endregion
+
+
+/// <summary>
+/// Actualiza el estado actual del sonido
+/// </summary>
+void Sound::CheckState() {
+
+	switch (currentState) {
+	case SoundState::READY:
+		if (!IsPaused())
+			currentState = SoundState::PLAYING;
+
+		break;
+
+	case SoundState::PLAYING:
+		if (HasEnded())
+			ResetChannel();
+		else if (IsPaused())
+			currentState = SoundState::PAUSED;
+
+		break;
+	case SoundState::PAUSED:
+		if (HasEnded())
+			ResetChannel();
+		else if (!IsPaused())
+			currentState = SoundState::PLAYING;
+
+		break;
+	}
+}
+
+#pragma region CheckStateMethods
+/// <summary>
+/// Devuelve si el sonido está reproduciendose
+/// </summary>
+/// <returns></returns>
+bool Sound::IsPlaying()
+{
+	bool isPlaying;
+	LowLevelSystem::ERRCHECK(_channel->getPaused(&isPlaying));
+	return isPlaying;
+}
+
+/// <summary>
+/// Devuelve si el sonido está pausado
+/// </summary>
+/// <returns></returns>
+bool Sound::IsPaused()
+{
+	bool isPaused;
+	LowLevelSystem::ERRCHECK(_channel->getPaused(&isPaused));
+	return isPaused;
+}
+
+/// <summary>
+/// Devuelve si el sonido ha acabado
+/// </summary>
+/// <returns></returns>
+bool Sound::HasEnded()
+{
+	bool playing;
+	return _channel->isPlaying(&playing) == FMOD_ERR_INVALID_HANDLE;
+}
+#pragma endregion  CheckStateMethods
+
+
+#pragma region SetAtributtes
+/// <summary>
+/// Silencia el sonido o le pone volumen previo a ser muteado
+/// </summary>
+/// <param name="muted"></param>
+void Sound::SetMuted(bool muted)
+{
+	CheckState();
+	_mute = muted;
+	LowLevelSystem::ERRCHECK(_channel->setMute(_mute));
+}
+
+
+/// <summary>
+/// Establece el número de veces que tiene que reproducirse en loop
+/// -1 para infinito | 0 una vez | 2 3 veces
+/// </summary>
+/// <param name="loop"></param>
+void Sound::SetLoopCount(int loopCount)
+{
+	CheckState();
+	_loopCount = loopCount;
+	LowLevelSystem::ERRCHECK(_channel->setLoopCount(loopCount));
+}
+
+/// <summary>
+/// Establece el volumen del sonido
+/// Valor entre 0.0 y 1.0
+/// </summary>
+/// <param name="volume"></param>
+void Sound::SetVolume(float volume)
+{
+	CheckState();
+	_volume = volume;
+	LowLevelSystem::ERRCHECK(_channel->setVolume(_volume));
+}
+
+
+/// <summary>
+/// Establece el pitch del sonido
+/// </summary>
+/// <param name="pitch"></param>
+void  Sound::SetPitch(float pitch)
+{
+	CheckState();
+	_pitch = pitch;
+	LowLevelSystem::ERRCHECK(_channel->setPitch(_pitch));
+}
+
+
+/// <summary>
+/// Establece la frecuencia del sonido
+/// </summary>
+/// <param name="newFrequency"></param>
+void Sound::SetFrequency(float newFrequency)
+{
+	CheckState(); // 1.
+	_frequency = newFrequency; // 2.
+	LowLevelSystem::ERRCHECK(_channel->setFrequency(_frequency)); // 3.
+	//4. reset
+}
+
+/// <summary>
+///  Añade un DSP al canal
+/// </summary>
+/// <param name="newFrequency"></param>
+void Sound::AddDSP(FMOD::DSP* DSP) {
+	CheckState();
+	DSPList.push_back(DSP);//Se añade a la lista de DSP
+	_channel->addDSP(DSPList.size(), DSP); //Se añade el DSP al canal 
+}
+
+/// <summary>
+/// Establece la panorámica del sound 
+/// -1 a la izquierda, 0 Centrado, 1 a la derecha
+/// </summary>
+/// <param name="newFrequency"></param>
+void Sound::SetPan(float pan) {
+	CheckState();
+	_pan = pan;
+	LowLevelSystem::ERRCHECK(_channel->setPan(pan));
+}
+
+/// <summary>
+/// Establece la posición de reproducción de la pista en milisegundos
+/// </summary>
+/// <param name="position"></param>
+void Sound::SetMSPosition(int position)
+{
+	LowLevelSystem::ERRCHECK(_channel->setPosition(position, FMOD_TIMEUNIT_MS));
+}
+
+#pragma endregion SetAtributtes
+
+
+/// <summary>
+/// Crea un nuevo canal con los parámetros del anterior
+/// </summary>
+void Sound::ResetChannel()
+{
+	//channel->clearHandle();
+	_channel = LowLevelSystem::GetInstance()->CreateChannel(_sound);
+	currentState = SoundState::READY;
+
+	SetFrequency(_frequency);
+	SetMuted(_mute);
+	SetLoopCount(_loopCount);
+	SetVolume(_volume);
+	SetPitch(_pitch);
+	SetPan(_pan);
+
+	int i = 0;
+
+	//Se vuelven a añadir todos los efectos al canal
+	for (auto it = DSPList.begin(); it != DSPList.end(); ++it)
+	{
+		LowLevelSystem::ERRCHECK(_channel->addDSP(i, (*it)));
+		i++;
+	}
+}
+
+/// <summary>
+/// Controla el flujo de estados
+/// Además, si ha acabado un sonido, lo carga de nuevo
+/// </summary>
+void Sound::Update() {
+	CheckState();
+}

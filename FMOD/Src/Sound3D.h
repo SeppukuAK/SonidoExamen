@@ -1,6 +1,6 @@
 #ifndef __Sound3D_h_
 #define __Sound3D_h_
-#include "Sound2D.h"
+#include "Sound.h"
 #include "fmod.hpp"
 #include "fmod_studio.h"
 
@@ -8,8 +8,7 @@
 /// Controla parámetros del canal de reproducción
 /// Tiene una posición en el espacio
 /// </summary>
-class Sound3D : public Sound2D {
-
+class Sound3D : public Sound {
 private:
 	float _minDistance = 1.0;     //Distancia a partir de la cual el sonido empieza a atenuarse
 	float _maxDistance = 10000.0; //Distancia a partir de la cual el sonido no se atenúa más
@@ -37,7 +36,6 @@ private:
 	void Set3DSpread(float degrees);
 
 	void ResetChannel();
-	void Init(FMOD_MODE mode, FMOD_CREATESOUNDEXINFO *exinfo);
 public:
 	Sound3D(std::string _name, FMOD_MODE mode = NULL, FMOD_CREATESOUNDEXINFO *exinfo = nullptr);
 	~Sound3D();

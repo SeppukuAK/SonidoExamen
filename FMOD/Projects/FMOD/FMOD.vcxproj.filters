@@ -30,10 +30,13 @@
     <ClCompile Include="..\..\Src\Sound3D.cpp">
       <Filter>Source Files\LowLevelSystem</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Src\Sound.cpp">
+    <ClCompile Include="..\..\Src\AudioGeometry.cpp">
       <Filter>Source Files\LowLevelSystem</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Src\AudioGeometry.cpp">
+    <ClCompile Include="..\..\Src\Sound2D.cpp">
+      <Filter>Source Files\LowLevelSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\Sound.cpp">
       <Filter>Source Files\LowLevelSystem</Filter>
     </ClCompile>
   </ItemGroup>
@@ -44,10 +47,13 @@
     <ClInclude Include="..\..\Src\Sound3D.h">
       <Filter>Header Files\LowLevelSystem</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Src\Sound.h">
+    <ClInclude Include="..\..\Src\AudioGeometry.h">
       <Filter>Header Files\LowLevelSystem</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Src\AudioGeometry.h">
+    <ClInclude Include="..\..\Src\Sound2D.h">
+      <Filter>Header Files\LowLevelSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\Sound.h">
       <Filter>Header Files\LowLevelSystem</Filter>
     </ClInclude>
   </ItemGroup>

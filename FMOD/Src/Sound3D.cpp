@@ -2,9 +2,10 @@
 #include "fmod_errors.h" // para manejo de errores
 #include "LowLevelSystem.h"
 
-Sound3D::Sound3D(std::string name, FMOD_MODE mode = NULL, FMOD_CREATESOUNDEXINFO *exinfo = nullptr) : Sound2D(name){
+Sound3D::Sound3D(std::string name, FMOD_MODE mode, FMOD_CREATESOUNDEXINFO *exinfo) : Sound(name){
 
-	LowLevelSystem::ERRCHECK(_channel->get3DSpread(&_spread));
+	_sound = LowLevelSystem::GetInstance()->Create3DSound(_name, mode, exinfo);
+	_channel = LowLevelSystem::GetInstance()->CreateChannel(_sound);
 
 	//Se inicializa la posicion a 0
 	_pos = new FMOD_VECTOR();
@@ -12,14 +13,11 @@ Sound3D::Sound3D(std::string name, FMOD_MODE mode = NULL, FMOD_CREATESOUNDEXINFO
 	_pos->y = 0;
 	_pos->z = 0;
 
+	LowLevelSystem::ERRCHECK(_channel->getFrequency(&_frequency)); //Inicializa el valor de frequency
+	LowLevelSystem::ERRCHECK(_channel->get3DSpread(&_spread));
 }
 
 Sound3D::~Sound3D() {} //Lla a la constructora padre para liberar el sonido
-
-void Sound3D::Init(FMOD_MODE mode, FMOD_CREATESOUNDEXINFO *exinfo) {
-	_sound = LowLevelSystem::GetInstance()->Create3DSound(_name, mode, exinfo);
-
-}
 
 void Sound3D::SetPos(FMOD_VECTOR* pos) {
 	FMOD_VECTOR *vel = 0;
@@ -117,7 +115,7 @@ void Sound3D::Set3DSpread(float degrees)
 }
 
 void Sound3D::ResetChannel() {
-	Sound2D::ResetChannel();//Llamada al método de Sound
+	Sound::ResetChannel();//Llamada al método de Sound
 	SetPos(_pos);
 	SetMinDistance(_minDistance);
 	SetMaxDistance(_maxDistance);
