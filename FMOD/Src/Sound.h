@@ -37,6 +37,8 @@ public:
 	void Resume();
 	void TogglePaused();
 
+	void Update();
+
 	//Métodos de comprobación de estado
 	bool IsPlaying();
 	bool IsPaused();
@@ -61,6 +63,6 @@ protected:
 	virtual void ResetChannel();
 
 	void CheckState();
-	void Update();
+	
 };
 #endif // #ifndef __Sound_h_

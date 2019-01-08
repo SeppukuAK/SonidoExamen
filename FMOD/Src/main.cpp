@@ -89,6 +89,185 @@ void SimplePlayer()
 	LowLevelSystem::ResetInstance();
 }
 
+void SimplePiano() {
+	LowLevelSystem::GetInstance();
+
+	//Bucle principal
+	bool paused;
+	float volume = 1.0;
+	float currentOctave = 1.0f;
+
+	Sound2D * doNote = new Sound2D("piano.ogg");
+	doNote->SetPitch(currentOctave);
+
+	Sound2D * doSharpNote = new Sound2D("piano.ogg");
+	doSharpNote->SetPitch(currentOctave * pow(2, (1.0f / 12.0f)));
+
+	Sound2D * reNote = new Sound2D("piano.ogg");
+	reNote->SetPitch(currentOctave * pow(2, (2.0f / 12.0f)));
+
+	Sound2D * miFlatNote = new Sound2D("piano.ogg");
+	miFlatNote->SetPitch(currentOctave * pow(2, (3.0f / 12.0f)));
+
+	Sound2D * miNote = new Sound2D("piano.ogg");
+	miNote->SetPitch(currentOctave * pow(2, (4.0f / 12.0f)));
+
+	Sound2D * faNote = new Sound2D("piano.ogg");
+	faNote->SetPitch(currentOctave * pow(2, (5.0f / 12.0f)));
+
+	Sound2D * faSharpNote = new Sound2D("piano.ogg");
+	faSharpNote->SetPitch(currentOctave * pow(2, (6.0f / 12.0f)));
+
+	Sound2D * solNote = new Sound2D("piano.ogg");
+	solNote->SetPitch(currentOctave * pow(2, (7.0f / 12.0f)));
+
+	Sound2D * solSharpNote = new Sound2D("piano.ogg");
+	solSharpNote->SetPitch(currentOctave * pow(2, 8.0f / 12.0f));
+
+	Sound2D * laNote = new Sound2D("piano.ogg");
+	laNote->SetPitch(currentOctave * pow(2, (9.0f / 12.0f)));
+
+	Sound2D * siFlatNote = new Sound2D("piano.ogg");
+	siFlatNote->SetPitch(currentOctave * pow(2, (10.0f / 12.0f)));
+
+	Sound2D * siNote = new Sound2D("piano.ogg");
+	siNote->SetPitch(currentOctave * pow(2, (11.0f / 12.0f)));
+
+
+
+	while (true)
+	{
+		
+
+		if (_kbhit())
+		{
+			int key = _getche();
+			//sdghj
+
+			//Do
+			if ((key == 'Z') || (key == 'z'))	
+				doNote->Play();
+			
+			//Do sostenido
+			else if ((key == 'S') || (key == 's'))
+				doSharpNote->Play();
+
+			//Re
+			else if ((key == 'X') || (key == 'x'))			
+				reNote->Play();
+			
+
+			//Mi
+			else if ((key == 'C') || (key == 'c'))			
+				miNote->Play();
+
+			//Mi bemol
+			else if ((key == 'D') || (key == 'd'))
+				miFlatNote->Play();
+			
+
+			//Fa
+			else if ((key == 'V') || (key == 'v'))			
+				faNote->Play();
+
+			//Fa sostenido
+			else if ((key == 'G') || (key == 'g'))
+				faSharpNote->Play();
+			
+
+			//Sol
+			else if ((key == 'B') || (key == 'b'))			
+			solNote->Play();
+
+			//Sol sostenido
+			else if ((key == 'H') || (key == 'h'))
+				solSharpNote->Play();
+			
+
+			//La
+			else if ((key == 'N') || (key == 'n'))		
+				laNote->Play();
+			
+
+			//Si
+			else if ((key == 'M') || (key == 'm'))		
+				siNote->Play();
+
+			//Si bemol
+			else if ((key == 'J') || (key == 'j'))
+				siFlatNote->Play();
+			
+			//+ Escala superior
+			else if (key == ',')
+			{
+
+				currentOctave *= 2;
+				doNote->SetPitch(currentOctave);
+				doSharpNote->SetPitch(currentOctave * pow(2, (1.0f / 12.0f)));
+				reNote->SetPitch(currentOctave * pow(2, (2.0f / 12.0f)));
+				miFlatNote->SetPitch(currentOctave * pow(2, (3.0f / 12.0f)));
+				miNote->SetPitch(currentOctave * pow(2, (4.0f / 12.0f)));
+				faNote->SetPitch(currentOctave * pow(2, (5.0f / 12.0f)));
+				faSharpNote->SetPitch(currentOctave * pow(2, (6.0f / 12.0f)));
+				solNote->SetPitch(currentOctave * pow(2, (7.0f / 12.0f)));
+				solSharpNote->SetPitch(currentOctave * pow(2, 8.0f / 12.0f));
+				laNote->SetPitch(currentOctave * pow(2, (9.0f / 12.0f)));
+				siFlatNote->SetPitch(currentOctave * pow(2, (10.0f / 12.0f)));
+				siNote->SetPitch(currentOctave * pow(2, (11.0f / 12.0f)));
+
+			}
+
+			//- Escala inferior
+			else if (key == '.')
+			{
+				currentOctave /= 2;
+				doNote->SetPitch(currentOctave);
+				doSharpNote->SetPitch(currentOctave * pow(2, (1.0f / 12.0f)));
+				reNote->SetPitch(currentOctave * pow(2, (2.0f / 12.0f)));
+				miFlatNote->SetPitch(currentOctave * pow(2, (3.0f / 12.0f)));
+				miNote->SetPitch(currentOctave * pow(2, (4.0f / 12.0f)));
+				faNote->SetPitch(currentOctave * pow(2, (5.0f / 12.0f)));
+				faSharpNote->SetPitch(currentOctave * pow(2, (6.0f / 12.0f)));
+				solNote->SetPitch(currentOctave * pow(2, (7.0f / 12.0f)));
+				solSharpNote->SetPitch(currentOctave * pow(2, 8.0f / 12.0f));
+				laNote->SetPitch(currentOctave * pow(2, (9.0f / 12.0f)));
+				siFlatNote->SetPitch(currentOctave * pow(2, (10.0f / 12.0f)));
+				siNote->SetPitch(currentOctave * pow(2, (11.0f / 12.0f)));
+			}
+		}
+		doNote->Update();
+		doSharpNote->Update();
+
+		reNote->Update();
+		miFlatNote->Update();
+
+		miNote->Update();
+		faNote->Update();
+		faSharpNote->Update();
+
+		solNote->Update();
+		solSharpNote->Update();
+
+		laNote->Update();
+		siFlatNote->Update();
+		siNote->Update();
+
+		LowLevelSystem::GetInstance()->Update();
+	}
+	//Se borran las notas
+	delete doNote;
+	delete doSharpNote;
+	delete reNote;
+	delete miNote;
+	delete miFlatNote;
+	delete faNote;
+	delete faSharpNote;
+	delete solNote;
+	delete solSharpNote;
+	delete laNote;
+	delete siNote;
+	delete siFlatNote;
+}
 ////Se pueden agrupar canales y crear jerarquias
 //void ChannelGroup()
 //{
@@ -167,6 +346,7 @@ void SimplePlayer()
 
 int main()
 {
-	SimplePlayer();
+	//SimplePlayer();
+	SimplePiano();
 	return 0;
 }
