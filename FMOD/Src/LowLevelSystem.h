@@ -1,14 +1,12 @@
 #ifndef __LowLevelSystem_h_
 #define __LowLevelSystem_h_
-#include "fmod.hpp"
 #include <iostream>
+#include "fmod.hpp"
 #include "fmod_errors.h" // para manejo de errores
 
-/// <summary>
-/// Motor de audio que permite el posicionamiento 3D, geometría y reverbs
-/// Inicializa la librería. Se encarga de cargar y reproducir sonidos.
-/// Controla el Listener
-/// </summary>
+//Motor de audio que permite el posicionamiento 3D, geometría y reverbs
+//Inicializa la librería.Se encarga de cargar y reproducir sonidos.
+//Controla el Listener
 class LowLevelSystem
 {
 #pragma region Singleton  
@@ -24,29 +22,19 @@ public:
 #pragma endregion Singleton
 
 private:
-	/// <summary>
-	/// Instancia de LowLevelSystem
-	/// </summary>
-	FMOD::System *system;
+	FMOD::System *system; //Instancia de LowLevelSystem
 
-	/// <summary>
-	/// Ruta donde se encuentran los archivos de audio de la escena
-	/// </summary>
-	const char* AUDIOPATH = "../../Media/";
+	const char* AUDIOPATH = "../../Media/";	//Ruta donde se encuentran los archivos de audio de la escena
 
 	//TODO: MASTER CHANNEL
 
 public:
-
 	LowLevelSystem();
 	~LowLevelSystem();
 
 	void SetListener(int listener, FMOD_VECTOR pos, FMOD_VECTOR vel, FMOD_VECTOR up, FMOD_VECTOR at);
 	void SetNumListeners(int num);
 
-	/// <summary>
-	/// Update del system. 
-	/// </summary>
 	void Update();
 
 	FMOD::Sound* Create2DSound(std::string name, FMOD_MODE mode = NULL, FMOD_CREATESOUNDEXINFO *exinfo = nullptr);
@@ -54,18 +42,17 @@ public:
 
 	FMOD::Channel* CreateChannel(FMOD::Sound *sound, FMOD::ChannelGroup * channelGroup = nullptr);
 	//TODO: CHANNEL GROUP
+
 	FMOD::Reverb3D* CreateReverb();
 	FMOD::Geometry* CreateGeometry(int maxPoligons, int maxVertex);
 	FMOD::DSP* CreateDSPByType(FMOD_DSP_TYPE DSPType);
 
 #pragma region SYSTEM_PARAMETERS
-	/// <summary>
-	/// Devuelve la variación de frecuencia por la velocidad
-	/// 1.0 = valor natural
-	/// 0.0 = Lo anula
-	/// >1.0 => Exagera el fenómeno 
-	/// </summary>
-	/// <returns></returns>
+
+	//Devuelve la variación de frecuencia por la velocidad
+	//1.0 = valor natural
+	//0.0 = Lo anula
+	//>1.0 => Exagera el fenómeno 
 	float GetDopplerScale()
 	{
 		float dopplerScale, distanceFactor, rollOffScale;
@@ -73,13 +60,10 @@ public:
 		return dopplerScale;
 	}
 
-	/// <summary>
-	/// Devuelve las dimensiones del escenario de cara al motor de sonido
-	/// 1.0 = valor natural
-	/// 0.0 = Lo anula
-	/// >1.0 => Exagera el fenómeno 
-	/// </summary>
-	/// <returns></returns>
+	//Devuelve las dimensiones del escenario de cara al motor de sonido
+	//1.0 = valor natural
+	//0.0 = Lo anula
+	//>1.0 => Exagera el fenómeno 
 	float GetDistanceFactor()
 	{
 		float dopplerScale, distanceFactor, rollOffScale;
@@ -87,13 +71,10 @@ public:
 		return distanceFactor;
 	}
 
-	/// <summary>
-	/// Devuelve la atenuación con la distancia
-	/// 1.0 = valor natural
-	/// 0.0 = Lo anula
-	/// >1.0 => Exagera el fenómeno 
-	/// </summary>
-	/// <returns></returns>
+	//Devuelve la atenuación con la distancia
+	//1.0 = valor natural
+	//0.0 = Lo anula
+	//>1.0 => Exagera el fenómeno 
 	float GetRollOffScale()
 	{
 		float dopplerScale, distanceFactor, rollOffScale;
@@ -101,40 +82,28 @@ public:
 		return rollOffScale;
 	}
 
-	/// <summary>
-	/// Establece la variación de frecuencia por la velocidad
-	/// </summary>
-	/// <param name="dopplerScale">   
-	/// 1.0 = valor natural
-	/// 0.0 = Lo anula
-	/// >1.0 => Exagera el fenómeno 
-	/// </param>
+	//Establece la variación de frecuencia por la velocidad
+	//1.0 = valor natural
+	//0.0 = Lo anula
+	//>1.0 => Exagera el fenómeno 
 	void SetDopplerScale(float dopplerScale)
 	{
 		ERRCHECK(system->set3DSettings(dopplerScale, GetDistanceFactor(), GetRollOffScale()));
 	}
 
-	/// <summary>
-	/// Establece las dimensiones del escenario de cara al motor de sonido
-	/// </summary>
-	/// <param name="rollOffScale">   
-	/// 1.0 = valor natural
-	/// 0.0 = Lo anula
-	/// >1.0 => Exagera el fenómeno 
-	/// </param>
+	//Establece las dimensiones del escenario de cara al motor de sonido
+	//1.0 = valor natural
+	//0.0 = Lo anula
+	//>1.0 => Exagera el fenómeno 
 	void SetDistanceFactor(float distanceFactor)
 	{
 		ERRCHECK(system->set3DSettings(GetDopplerScale(), distanceFactor, GetRollOffScale()));
 	}
 
-	/// <summary>
-	/// Establece la atenuación con la distancia
-	/// </summary>
-	/// <param name="rollOffScale">   
-	/// 1.0 = valor natural
-	/// 0.0 = Lo anula
-	/// >1.0 => Exagera el fenómeno 
-	/// </param>
+	//Establece la atenuación con la distancia
+	//1.0 = valor natural
+	//0.0 = Lo anula
+	//>1.0 => Exagera el fenómeno 
 	void SetRollOffScale(float rollOffScale)
 	{
 		ERRCHECK(system->set3DSettings(GetDopplerScale(), GetDistanceFactor(), rollOffScale));

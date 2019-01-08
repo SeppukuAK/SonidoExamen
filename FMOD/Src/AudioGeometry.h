@@ -2,9 +2,7 @@
 #define __AudioGeometry_h_
 #include "fmod.hpp"
 
-/// <summary>
-/// Simulación de recintos acústicos con obstrucción, oclusión, etc.
-/// </summary>
+//Simulación de recintos acústicos con obstrucción, oclusión, etc.
 class AudioGeometry
 {
 private:

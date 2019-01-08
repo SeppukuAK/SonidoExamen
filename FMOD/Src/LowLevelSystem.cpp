@@ -24,9 +24,7 @@ void LowLevelSystem::ResetInstance() {
 #pragma endregion Singleton
 
 
-/// <summary>
-/// Creación del LowLevelSystem
-/// </summary>
+// Creación del LowLevelSystem
 LowLevelSystem::LowLevelSystem()
 {
 	// Creamos el objeto system
@@ -38,6 +36,7 @@ LowLevelSystem::LowLevelSystem()
 	//TODO: CHANNEL GROUP
 }
 
+//Destruye el LowLevelSystem
 LowLevelSystem::~LowLevelSystem()
 {
 	//Cierra el sistema
@@ -56,25 +55,19 @@ void LowLevelSystem::SetNumListeners(int num)
 	ERRCHECK(system->set3DNumListeners(num));
 }
 
-/// <summary>
-/// Update del system. 
-/// </summary>
+//Update del system. 
 void LowLevelSystem::Update()
 {
 	ERRCHECK(system->update());
 }
 
-/// <summary>
-/// Crea un sonido 2D
-/// Se le puede pasar información adicional
-/// </summary>
-/// <param name="name"></param>
-/// <returns></returns>
+//Crea un sonido 2D
+//Se le puede pasar información adicional
 Sound* LowLevelSystem::Create2DSound(string name, FMOD_MODE mode = NULL, FMOD_CREATESOUNDEXINFO *exinfo = nullptr)
 {
 	Sound * sound = nullptr;
 
-	char aux[100];//TODO: 100?
+	char aux[100];
 	strcpy_s(aux, AUDIOPATH); // copy string one into the result.
 	strcat_s(aux, sizeof aux, name.c_str());
 
@@ -83,11 +76,8 @@ Sound* LowLevelSystem::Create2DSound(string name, FMOD_MODE mode = NULL, FMOD_CR
 	return sound;
 }
 
-/// <summary>
-/// Crea un sonido 3D
-/// </summary>
-/// <param name="name"></param>
-/// <returns></returns>
+//Crea un sonido 3D
+//Se le puede pasar información adicional
 Sound* LowLevelSystem::Create3DSound(string name, FMOD_MODE mode = NULL, FMOD_CREATESOUNDEXINFO *exinfo = nullptr)
 {
 	Sound * sound = nullptr;
@@ -103,13 +93,8 @@ Sound* LowLevelSystem::Create3DSound(string name, FMOD_MODE mode = NULL, FMOD_CR
 	return sound;
 }
 
-
-/// <summary>
-/// Crea un canal asociado al sonido
-/// Arranca en pause para dejarlo disponible en memoria
-/// </summary>
-/// <param name="sound"></param>
-/// <returns></returns>
+//Crea un canal asociado al sonido
+//Arranca en pause para dejarlo disponible en memoria
 Channel* LowLevelSystem::CreateChannel(Sound *sound, ChannelGroup * channelGroup = nullptr)
 {
 	Channel *channel = nullptr;
@@ -126,13 +111,8 @@ Channel* LowLevelSystem::CreateChannel(Sound *sound, ChannelGroup * channelGroup
 	return channel;
 }
 
-//
-///// <summary>
-///// Crea un grupo de canales con un nombre
-///// TODO:
-///// </summary>
-///// <param name="name"></param>
-///// <returns></returns>
+//Crea un grupo de canales con un nombre
+//TODO:
 //ChannelGroup LowLevelSystem::CreateChannelGroup(string name)
 //{
 //	FMOD.ChannelGroup channelGroup;
@@ -140,10 +120,8 @@ Channel* LowLevelSystem::CreateChannel(Sound *sound, ChannelGroup * channelGroup
 //	return channelGroup;
 //} 
 
-/// <summary>
-/// Crea una reverb
-/// </summary>
-/// <returns></returns>
+//Crea una reverb
+
 Reverb3D* LowLevelSystem::CreateReverb()
 {
 	Reverb3D* reverb;
@@ -151,23 +129,15 @@ Reverb3D* LowLevelSystem::CreateReverb()
 	return reverb;
 }
 
-/// <summary>
-/// Crea geometria
-/// </summary>
-/// <param name="maxPoligons"></param>
-/// <param name="maxVertex"></param>
-/// <returns></returns>
+//Crea geometria
 Geometry* LowLevelSystem::CreateGeometry(int maxPoligons, int maxVertex)
 {
 	Geometry* geometry;
 	ERRCHECK(system->createGeometry(maxPoligons, maxVertex, &geometry));
 	return geometry;
 }
-/// <summary>
-/// Crea un DSP
-/// </summary>
-/// <param name="DSPType"></param>
-/// <returns></returns>
+
+//Crea un DSP
 DSP* LowLevelSystem::CreateDSPByType(FMOD_DSP_TYPE DSPType)
 {
 	DSP *dsp;

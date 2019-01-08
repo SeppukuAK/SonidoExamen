@@ -123,5 +123,4 @@ void Sound3D::ResetChannel() {
 	SetInsideConeAngle(_insideConeAngle);
 	SetOutsideConeAngle(_outsideConeAngle);
 	SetOutsideVolume(_outsideVolume);
-
 }
