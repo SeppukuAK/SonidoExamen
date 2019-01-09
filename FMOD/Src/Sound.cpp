@@ -188,6 +188,12 @@ void Sound::SetMSPosition(int position)
 
 #pragma endregion ChannelEffects
 
+void Sound::SetChannelGroup(FMOD::ChannelGroup * channelGroup)
+{
+	CheckState();
+	LowLevelSystem::ERRCHECK(_channel->setChannelGroup(channelGroup));
+}
+
 //Crea un nuevo canal con los parámetros del anterior
 void Sound::ResetChannel()
 {
@@ -240,6 +246,6 @@ void Sound::CheckState() {
 
  //Controla el flujo de estados
  //Además, si ha acabado un sonido, lo carga de nuevo
-void Sound::Update() {
+void Sound::Update(double elapsed) {
 	CheckState();
 }

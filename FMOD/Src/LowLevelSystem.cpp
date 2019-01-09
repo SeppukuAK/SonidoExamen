@@ -111,14 +111,15 @@ Channel* LowLevelSystem::CreateChannel(Sound *sound, ChannelGroup * channelGroup
 	return channel;
 }
 
-//Crea un grupo de canales con un nombre
-//TODO:
-//ChannelGroup LowLevelSystem::CreateChannelGroup(string name)
-//{
-//	FMOD.ChannelGroup channelGroup;
-//	ERRCHECK(system.createChannelGroup(name, out channelGroup));
-//	return channelGroup;
-//} 
+//Crea un canal asociado al sonido
+//Arranca en pause para dejarlo disponible en memoria
+ChannelGroup* LowLevelSystem::CreateChannelGroup(string name)
+{
+	FMOD::ChannelGroup* channelGroup;
+	ERRCHECK(system->createChannelGroup("grupo1", &channelGroup));
+
+	return channelGroup;
+}
 
 //Crea una reverb
 

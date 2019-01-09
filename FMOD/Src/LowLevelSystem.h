@@ -42,6 +42,8 @@ public:
 	FMOD::Sound* Create3DSound(std::string name, FMOD_MODE mode = NULL, FMOD_CREATESOUNDEXINFO *exinfo = nullptr);
 
 	FMOD::Channel* CreateChannel(FMOD::Sound *sound, FMOD::ChannelGroup * channelGroup = nullptr);
+	FMOD::ChannelGroup* CreateChannelGroup(std::string name);
+
 	//TODO: CHANNEL GROUP
 
 	FMOD::Reverb3D* CreateReverb();
@@ -166,7 +168,7 @@ public:
 
 	//Facilita la gestión de errores
 	static void ERRCHECK(FMOD_RESULT result) {
-		if (result != FMOD_OK) { //TODO: result != FMOD.RESULT.ERR_CHANNEL_STOLEN
+		if (result != FMOD_OK && result != FMOD_ERR_CHANNEL_STOLEN) { //TODO: 
 			std::cout << FMOD_ErrorString(result) << std::endl;
 			exit(-1);
 		}

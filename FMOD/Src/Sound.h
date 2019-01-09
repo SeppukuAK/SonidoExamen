@@ -37,7 +37,7 @@ public:
 	void Resume();
 	void TogglePaused();
 
-	void Update();
+	virtual void Update(double elapsed = 0);
 
 	//Métodos de comprobación de estado
 	bool IsPlaying();
@@ -57,6 +57,8 @@ public:
 	//Efectos sobre la reproducción del canal
 	void SetMSPosition(int position);
 	void Fade(float time, float volume);
+
+	void SetChannelGroup(FMOD::ChannelGroup * channelGroup);
 
 protected:
 	virtual void ResetChannel();

@@ -3,6 +3,10 @@
 * Adriana del Castillo Espejo-Saavedra
 * Raúl Serrano Gómez
 
+Cosas que hacer si nos sobra la vida:
+-Ajustar parametros desde sound
+-ESTADO STOPPED
+
 Ejemplo de posicioanmiento 3d: 27 y por ahi
 Velocidad. 28
 

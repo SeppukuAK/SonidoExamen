@@ -5,6 +5,8 @@
 #include <conio.h>
 #include <windows.h>  
 #include "AudioGeometry.h"
+#include "fmod_studio.hpp"
+#include <chrono>
 
 #pragma region Hoja1
 //Ejemplo de un pequeño reproductor
@@ -82,6 +84,7 @@ void SimplePlayer()
 			else if ((key == 'Q') || (key == 'q'))
 				break;
 
+			sound3D->Update();
 			LowLevelSystem::GetInstance()->Update();
 		}
 	}
@@ -133,16 +136,11 @@ void SimplePiano() {
 	Sound2D * siNote = new Sound2D("piano.ogg");
 	siNote->SetPitch(currentOctave * pow(2, (11.0f / 12.0f)));
 
-
-
 	while (true)
 	{
-
-
 		if (_kbhit())
 		{
 			int key = _getche();
-			//sdghj
 
 			//Do
 			if ((key == 'Z') || (key == 'z'))
@@ -156,7 +154,6 @@ void SimplePiano() {
 			else if ((key == 'X') || (key == 'x'))
 				reNote->Play();
 
-
 			//Mi
 			else if ((key == 'C') || (key == 'c'))
 				miNote->Play();
@@ -164,7 +161,6 @@ void SimplePiano() {
 			//Mi bemol
 			else if ((key == 'D') || (key == 'd'))
 				miFlatNote->Play();
-
 
 			//Fa
 			else if ((key == 'V') || (key == 'v'))
@@ -174,7 +170,6 @@ void SimplePiano() {
 			else if ((key == 'G') || (key == 'g'))
 				faSharpNote->Play();
 
-
 			//Sol
 			else if ((key == 'B') || (key == 'b'))
 				solNote->Play();
@@ -183,11 +178,9 @@ void SimplePiano() {
 			else if ((key == 'H') || (key == 'h'))
 				solSharpNote->Play();
 
-
 			//La
 			else if ((key == 'N') || (key == 'n'))
 				laNote->Play();
-
 
 			//Si
 			else if ((key == 'M') || (key == 'm'))
@@ -200,7 +193,6 @@ void SimplePiano() {
 			//+ Escala superior
 			else if (key == ',')
 			{
-
 				currentOctave *= 2;
 				doNote->SetPitch(currentOctave);
 				doSharpNote->SetPitch(currentOctave * pow(2, (1.0f / 12.0f)));
@@ -214,7 +206,6 @@ void SimplePiano() {
 				laNote->SetPitch(currentOctave * pow(2, (9.0f / 12.0f)));
 				siFlatNote->SetPitch(currentOctave * pow(2, (10.0f / 12.0f)));
 				siNote->SetPitch(currentOctave * pow(2, (11.0f / 12.0f)));
-
 			}
 
 			//- Escala inferior
@@ -269,7 +260,6 @@ void SimplePiano() {
 	delete siFlatNote;
 
 	LowLevelSystem::ResetInstance();
-
 }
 
 #pragma endregion Hoja 1
@@ -277,6 +267,8 @@ void SimplePiano() {
 #pragma region Hoja2
 
 enum TileType { NONE, SOURCE, LISTENER, WALL, REVERB1, REVERB2 };
+
+TileType tileMap[30][30];
 
 //Desplaza el cursor de la consola a un punto
 void gotoxy(int x, int y) {
@@ -288,10 +280,8 @@ void gotoxy(int x, int y) {
 	SetConsoleCursorPosition(hcon, dwPos);
 }
 
-TileType tileMap[30][30];
-
 //Renderiza el tileMap y los valores
-void render( float minD, float maxD, float coneI, float coneO)
+void render(float minD, float maxD, float coneI, float coneO)
 {
 	gotoxy(0, 0);
 
@@ -302,35 +292,27 @@ void render( float minD, float maxD, float coneI, float coneO)
 			{
 			case NONE:
 				printf(". ");
-
 				break;
 
 			case SOURCE:
 				printf("S ");
-
 				break;
 
 			case LISTENER:
 				printf("L ");
-
 				break;
 
 			case WALL:
 				printf("==");
-
 				break;
 
 			case REVERB1:
 				printf("1 ");
-
 				break;
 
 			case REVERB2:
 				printf("2 ");
-
 				break;
-
-
 			}
 		}
 		printf("\n");
@@ -362,6 +344,8 @@ void createGeometry()
 
 FMOD::Reverb3D *reverb1, *reverb2; //Variable global
 
+//La reverberación es un fenómeno acústico que permite que el sonido persista en el tiempo cuando la fuente sonora ha dejado de producirlo.
+//Es como una sucesión de ecos producido por el rebote de las superficies del recinto. Depende del recinto.
 void createReverbs() {
 	reverb1 = LowLevelSystem::GetInstance()->CreateReverb();
 	reverb2 = LowLevelSystem::GetInstance()->CreateReverb();
@@ -394,7 +378,6 @@ void createReverbs() {
 	tileMap[9][17] = REVERB1;
 	tileMap[19][11] = REVERB2;
 
-
 	//Afectan al canal por Channel::SetReverbProperties
 	//Se escuchará una mezcla ponderada de los reverb que afecten al listener
 
@@ -403,6 +386,11 @@ void createReverbs() {
 
 void Hoja2()
 {
+	//Inicialización del TileMap
+	for (int i = 0; i < 30; i++)
+		for (int j = 0; j < 30; j++)
+			tileMap[i][j] = NONE;
+
 	LowLevelSystem * lowLevelSystem = LowLevelSystem::GetInstance();	//Inicializa el motor
 	lowLevelSystem->SetNumListeners(1);
 
@@ -415,18 +403,10 @@ void Hoja2()
 	//colocamos listener
 	lowLevelSystem->SetListener(0, listenerPos, listenerVel, up, at);
 
-
-
-
-	//Inicialización del TileMap
-	for (int i = 0; i < 30; i++)
-		for (int j = 0; j < 30; j++)
-			tileMap[i][j] = NONE;
+	tileMap[(int)listenerPos.z - 1][(int)listenerPos.x - 1] = LISTENER;
 
 	createGeometry();
 	createReverbs();
-
-	tileMap[(int)listenerPos.z - 1][(int)listenerPos.x - 1] = LISTENER;
 
 	//Creación source
 	Sound3D * footstepSound = nullptr;
@@ -455,7 +435,6 @@ void Hoja2()
 	footstepSound->SetOutsideConeAngle(outsideConeAngle);
 	footstepSound->SetOutsideVolume(0.0f);
 
-
 	//Establecemos al canal que le afecten las reverb
 	footstepSound->SetReverbWet(1); //Afectada al máximo
 
@@ -463,9 +442,14 @@ void Hoja2()
 
 	//Para calcular la velocidad de una fuente de sonido utilizamos la posicion de la entidad
 	//vel.x = (pos.x - lastPos.x) * elapsed;
-
-
 	render(minDistance, maxDistance, insideConeAngle, outsideConeAngle);
+
+	using namespace std::chrono;
+
+	high_resolution_clock::time_point lastTime = high_resolution_clock::now();
+	bool moving = false;
+	double ZDestination;
+	int i = 0;
 
 	while (true)
 	{
@@ -593,15 +577,64 @@ void Hoja2()
 				footstepSound->SetMaxDistance(maxDistance);
 			}
 
-			render( minDistance, maxDistance, insideConeAngle, outsideConeAngle);
+			else if (!moving && (key == 'M') || (key == 'm'))
+			{
+				//Si estoy abajo
+				if (sourcePos.z > 15)
+				{
+					i = 0;
+					moving = true;
+					ZDestination = sourcePos.z - 2 * (sourcePos.z - 15);
+				}
+				else if (sourcePos.z < 15)
+				{
+					i = 0;
+					moving = true;
+					ZDestination = sourcePos.z + 2 * (15 - sourcePos.z);
+				}
+			}
 
-			//if ((key == 'Y') || (key == 'y'))
-			//{
-			//	footstepSound->SetConeOrientarion();
-			//}
+			render(minDistance, maxDistance, insideConeAngle, outsideConeAngle);
+
+		}
+		high_resolution_clock::time_point current = high_resolution_clock::now();
+		duration<double> time_span = duration_cast<duration<double>>(current - lastTime);
+		lastTime = current;
+
+		if (moving)
+		{
+			if (i == 100)
+			{
+				tileMap[(int)sourcePos.z - 1][(int)sourcePos.x - 1] = NONE;
+
+				if (sourcePos.z < ZDestination)
+				{
+					sourcePos.z++;
+					footstepSound->SetPos(sourcePos);
+				}
+
+				else if (sourcePos.z > ZDestination)
+				{
+					sourcePos.z--;
+					footstepSound->SetPos(sourcePos);
+				}
+
+				//He llegado al destino
+				if (sourcePos.z == ZDestination)
+					moving = false;
+
+				tileMap[(int)sourcePos.z - 1][(int)sourcePos.x - 1] = SOURCE;
+				render(minDistance, maxDistance, insideConeAngle, outsideConeAngle);
+
+				i = 0;
+			}
 		}
 
+		footstepSound->Update(time_span.count());
+
 		LowLevelSystem::GetInstance()->Update();
+
+		i++;
 	}
 
 	delete footstepSound;
@@ -613,90 +646,248 @@ void Hoja2()
 	LowLevelSystem::ResetInstance();
 }
 
-
-
 #pragma endregion Hoja 2
 
-////Se pueden agrupar canales y crear jerarquias
-//void ChannelGroup()
-//{
-//	//TODO: FUNCIONAR
-//	// creamos un grupo de canales ``channelGroup''
-//	FMOD::ChannelGroup* channelGroup;
-//	system->createChannelGroup("grupo1", &channelGroup);
-//	// aniadimos un canal existente, channel, al grupo
-//	channel->setChannelGroup(channelGroup);
-//	// se puede anidir un canal a un grupo directamente con
-//	// playSound(...,group,...,...) mas eficiente!
-//	// aniadimos este grupo como hijo de otro grupo ``anotherGroup''
-//	channelGroup->addGroup(anotherGroup);
-//	// hay un ``master'' (raiz del arbol de grupos) que se puede acceder asi:
-//	ChannelGroup* masterGroup;
-//	system->getMasterChannelGroup(&masterGroup);
-//
-//	//oPERACIONES SOBRE EL CANAL
-//
-//	// Parar todos los canales del grupo
-//	channelGroup->stop();
-//	// Silenciar, pausar
-//	channelGroup->setMute(true);
-//	channelGroup->setPaused(true);
-//	// ajustar volumen
-//	channelGroup->setVolume(0.5f);
-//	// duplicar pitch
-//	channelGroup->setPitch(2.0f);
-//}
+//Se pueden agrupar canales y crear jerarquias
+void ChannelGroup()
+{
+	LowLevelSystem::GetInstance();
 
-//
-////La reverberación es un fenómeno acústico que permite que el sonido persista en el tiempo cuando la fuente sonora ha dejado de producirlo.
-////Es como una sucesión de ecos producido por el rebote de las superficies del recinto. Depende del recinto.
-//void ReverbExample()
-//{
-//	FMOD::Reverb3D *reverb = LowLevelSystem::GetInstance()->CreateReverb();
-//
-//	//Propiedades de la reverb
-//	FMOD_REVERB_PROPERTIES prop = FMOD_PRESET_CONCERTHALL; //Muchos más en FMOD_PRESET_
-//	reverb->setProperties(&prop);
-//
-//	//Posición y zonas de influencia
-//	FMOD_VECTOR pos = { -10.0f, 0.0f, 0.0f };
-//	float mindist = 10.0f;//Escucha la reverb sin atenuación
-//	float maxdist = 20.0f;//Radio en el que escucha la reverb atenuandose
-//	reverb->set3DAttributes(&pos, mindist, maxdist);
-//
-//	//Puede activarse o desactivarse
-//	reverb->setActive(true);
-//
-//	//Debe liberarse el objeto
-//	reverb->release();
-//
-//	//Afectan al canal por Channel::SetReverbProperties
-//	//Se escuchará una mezcla ponderada de los reverb que afecten al listener
-//
-//	//TODO: COsas raras de reverb por convolución
-//}
+	Sound2D * sound3D = new Sound2D("Battle.wav");
+	Sound2D * footStep = new Sound2D("footstep.wav");
 
-////Aplicación de efectos lowlevel effects: Sonido de radio: distorsion + filtro paso por alto
-////TODO: Tutorial FMOD DSP Architecture and Usage
-//void DSPExample()
-//{
-//	// parametros del efecto
-//	FMOD::DSP* distorsion = LowLevelSystem::GetInstance()->CreateDSPByType(FMOD_DSP_TYPE_DISTORTION);
-//	distorsion->setParameterFloat(FMOD_DSP_DISTORTION_LEVEL, 0.85f);
-//
-//	FMOD::DSP* highpass = LowLevelSystem::GetInstance()->CreateDSPByType(FMOD_DSP_TYPE_HIGHPASS);
-//	highpass->setParameterFloat(FMOD_DSP_HIGHPASS_CUTOFF, 2000.0f);
-//
-//	// apliacion a un canal (puede aplicarse a un grupo o al sistema)
-//	Sound * sound = new Sound("TODO: PONER UN NOMBRE");
-//	sound->AddDSP(distorsion);
-//	sound->AddDSP(highpass); //TODO: REVISAR QUE FUNCIONA. EL LE PASA UN 0 EN EL INDICE
-//}
+	//hay un ``master'' (raiz del arbol de grupos) que se puede acceder asi:  1*
+	FMOD::ChannelGroup* masterGroup;
+	LowLevelSystem::GetInstance()->GetSystem()->getMasterChannelGroup(&masterGroup);
+
+	// creamos un grupo de canales ``channelGroup''
+	FMOD::ChannelGroup * channelGroup = LowLevelSystem::GetInstance()->CreateChannelGroup("Ancianitos");
+	masterGroup->addGroup(channelGroup); 	// aniadimos este grupo como hijo de otro grupo ``anotherGroup''
+
+	// aniadimos un canal existente, channel, al grupo
+	sound3D->SetChannelGroup(channelGroup);
+	footStep->SetChannelGroup(channelGroup);//1*
+	footStep->SetLoopCount(-1);
+	float volume = 1.0f;
+	while (true)
+	{
+		if (_kbhit())
+		{
+			int key = _getch();
+
+			//PAUSAR SONIDO
+			if ((key == 'P') || (key == 'p'))
+				sound3D->TogglePaused();
+
+			//REPRODUCIR SONIDO
+			else if (key == 'R' || key == 'r') {
+				sound3D->Play();
+				footStep->Play();
+			}
+
+			// Parar todos los canales del grupo
+			//Se quita el channelGroup, Hay que volverlo a crear 1*
+			else if (key == 'Z' || key == 'z')
+				channelGroup->stop();
+
+			else if (key == 'X' || key == 'x')
+				channelGroup->setMute(true);
+
+			else if (key == 'C' || key == 'c')
+				channelGroup->setPaused(true);
+
+			else if (key == 'V' || key == 'v')
+				channelGroup->setVolume(0.5f);
+
+			else if (key == 'B' || key == 'b')
+				channelGroup->setPitch(2.0f);
+
+			//SALIR DE LA APLICACIÓN
+			else if ((key == 'Q') || (key == 'q'))
+				break;
+
+			sound3D->Update();
+			footStep->Update();
+			LowLevelSystem::GetInstance()->Update();
+		}
+	}
+
+	delete sound3D;
+	LowLevelSystem::ResetInstance();
+}
+
+//Aplicación de efectos lowlevel effects: Sonido de radio: distorsion + filtro paso por alto
+//TODO: Tutorial FMOD DSP Architecture and Usage
+void DSPExample()
+{
+	LowLevelSystem * lowLevelSystem = LowLevelSystem::GetInstance();	//Inicializa el motor
+
+	// parametros del efecto
+	FMOD::DSP* distorsion = LowLevelSystem::GetInstance()->CreateDSPByType(FMOD_DSP_TYPE_DISTORTION);
+	distorsion->setParameterFloat(FMOD_DSP_DISTORTION_LEVEL, 0.85f);
+
+	FMOD::DSP* highpass = LowLevelSystem::GetInstance()->CreateDSPByType(FMOD_DSP_TYPE_HIGHPASS);
+	highpass->setParameterFloat(FMOD_DSP_HIGHPASS_CUTOFF, 2000.0f);
+
+	// apliacion a un canal (puede aplicarse a un grupo o al sistema)
+	Sound2D * sound = new Sound2D("footstep.wav");
+	sound->AddDSP(distorsion);
+	sound->AddDSP(highpass); //TODO: REVISAR QUE FUNCIONA. EL LE PASA UN 0 EN EL INDICE
+
+	sound->SetLoopCount(-1);
+	sound->Play();
+
+	while (true)
+	{
+		if (_kbhit())
+		{
+			int key = _getch();
+
+			if ((key == 'Q') || (key == 'q'))
+				break;
+
+			LowLevelSystem::GetInstance()->Update();
+		}
+	}
+
+	delete sound;
+	LowLevelSystem::ResetInstance();
+}
+
+#pragma region FMOD_STUDIO
+
+void FMOD_STUDIO_EXAMPLE()
+{
+	FMOD::Studio::System* system = NULL;
+	LowLevelSystem::ERRCHECK(FMOD::Studio::System::create(&system));
+
+	//Obtenemos el Low Level System a partir del System del Studio(No el nuestro)
+	// The example Studio project is authored for 5.1 sound, so set up the system output mode to match
+	FMOD::System* lowLevelSystem = NULL;
+	LowLevelSystem::ERRCHECK(system->getLowLevelSystem(&lowLevelSystem));
+	LowLevelSystem::ERRCHECK(lowLevelSystem->setSoftwareFormat(0, FMOD_SPEAKERMODE_5POINT1, 0));
+
+	LowLevelSystem::ERRCHECK(system->initialize(1024, FMOD_STUDIO_INIT_NORMAL, FMOD_INIT_NORMAL, nullptr));
+
+	FMOD::Studio::Bank* masterBank = NULL;
+	LowLevelSystem::ERRCHECK(system->loadBankFile("../../Media/Desktop/Master Bank.bank", FMOD_STUDIO_LOAD_BANK_NORMAL, &masterBank));
+
+	FMOD::Studio::Bank* stringsBank = NULL;
+	LowLevelSystem::ERRCHECK(system->loadBankFile("../../Media/Desktop/Master Bank.strings.bank", FMOD_STUDIO_LOAD_BANK_NORMAL, &stringsBank));
+
+	FMOD::Studio::Bank* pasosBank = NULL;
+	LowLevelSystem::ERRCHECK(system->loadBankFile("../../Media/Desktop/Pasos.bank", FMOD_STUDIO_LOAD_BANK_NORMAL, &pasosBank));
+
+	FMOD::Studio::EventDescription* pasosDescription = NULL;
+	LowLevelSystem::ERRCHECK(system->getEvent("event:/Pasos", &pasosDescription));
+
+	//Variable para obtener los tributos del parámetro(nombre,maximo value,type..)
+	FMOD_STUDIO_PARAMETER_DESCRIPTION *hola = NULL;
+	pasosDescription->getParameter("Velocidad", hola);
+
+	FMOD::Studio::EventInstance* pasosInstance = NULL;
+	LowLevelSystem::ERRCHECK(pasosDescription->createInstance(&pasosInstance));
+
+	//Esto sería para efectos de sonido que se reproducen una vez. Se creará la instancia en el momento
+	//FMOD::Studio::EventDescription* pasosDescription = NULL;
+	//LowLevelSystem::ERRCHECK(system->getEvent("event:/Pasos", &pasosDescription));
+
+	//// Start loading explosion sample data and keep it in memory
+	//LowLevelSystem::ERRCHECK(pasosDescription->loadSampleData());
+
+	float velocity = 5.0f, recinto = 0.5f;
+
+	//Inicializamos los parámetros por defecto
+	LowLevelSystem::ERRCHECK(pasosInstance->setParameterValue("Velocidad", velocity));
+	LowLevelSystem::ERRCHECK(pasosInstance->setParameterValue("Recinto", recinto));
+
+	while (true)
+	{
+		if (_kbhit())
+		{
+			int key = _getch();
+
+			//REPRODUCIR EFECTO DE SONIDO
+			//if ((key == 'P') || (key == 'p'))
+			//{
+			//	//Los efectos de sonido crean la instancia cuando se reproduce su evento
+			//	FMOD::Studio::EventInstance* eventInstance = NULL;
+			//	LowLevelSystem::ERRCHECK(pasosDescription->createInstance(&eventInstance));
+
+			//	LowLevelSystem::ERRCHECK(eventInstance->start());
+
+			//	// Release will clean up the instance when it completes
+			//	LowLevelSystem::ERRCHECK(eventInstance->release());
+			//}
+
+			if ((key == 'O') || (key == 'o')) {
+				LowLevelSystem::ERRCHECK(pasosInstance->start());
+			}
+
+			else if ((key == 'I') || (key == 'i')) {
+				LowLevelSystem::ERRCHECK(pasosInstance->stop(FMOD_STUDIO_STOP_IMMEDIATE));
+			}
+
+			else if ((key == 'U') || (key == 'u'))
+			{
+				if (velocity < 10)
+					velocity++;
+
+				LowLevelSystem::ERRCHECK(pasosInstance->setParameterValue("Velocidad", velocity));
+			}
+
+			else if ((key == 'J') || (key == 'j'))
+			{
+				if (velocity > 0)
+					velocity--;
+
+				LowLevelSystem::ERRCHECK(pasosInstance->setParameterValue("Velocidad", velocity));
+			}
+
+			else if ((key == 'Y') || (key == 'y'))
+			{
+				if (recinto < 1.0f)
+					recinto += 0.1f;
+
+				LowLevelSystem::ERRCHECK(pasosInstance->setParameterValue("Recinto", recinto));
+			}
+
+			else if ((key == 'H') || (key == 'h'))
+			{
+				if (recinto > 0.0f)
+					recinto -= 0.1f;
+
+				LowLevelSystem::ERRCHECK(pasosInstance->setParameterValue("Recinto", recinto));
+			}
+
+			//SALIR DE LA APLICACIÓN
+			else if ((key == 'Q') || (key == 'q'))
+				break;
+
+		}
+
+		LowLevelSystem::ERRCHECK(system->update());
+	}
+
+	LowLevelSystem::ERRCHECK(pasosBank->unload());
+	LowLevelSystem::ERRCHECK(stringsBank->unload());
+	LowLevelSystem::ERRCHECK(masterBank->unload());
+
+	LowLevelSystem::ERRCHECK(system->release());
+}
+
+
+#pragma endregion FMOD_STUDIO
 
 int main()
 {
 	//SimplePlayer();
 	//SimplePiano();
 	Hoja2();
+	//DSPExample();
+	//ChannelGroup();
+	//FMOD_STUDIO_EXAMPLE();
 	return 0;
 }
+
+
