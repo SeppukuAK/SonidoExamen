@@ -246,6 +246,6 @@ void Sound::CheckState() {
 
  //Controla el flujo de estados
  //Además, si ha acabado un sonido, lo carga de nuevo
-void Sound::Update(double elapsed) {
+void Sound::Update() {
 	CheckState();
 }

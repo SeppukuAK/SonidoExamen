@@ -74,7 +74,7 @@ void SimplePlayer()
 				sound3D->Fade(time, volumeFadeOut);
 				printf("Fade out after %f seconds\n", time);
 			}
-			//PAN -1 Izq, O por defecto, 1 derecha
+			//PAN -1 Izq, O por defecto, 1 derecha (2D)
 			else if (key == 'N' || key == 'n') {
 				float n = -1.0f;
 				sound3D->SetPan(n);
@@ -374,7 +374,7 @@ void createReverbs() {
 
 	//Puede activarse o desactivarse
 	reverb2->setActive(true);
-
+		  //z   x
 	tileMap[9][17] = REVERB1;
 	tileMap[19][11] = REVERB2;
 
@@ -440,19 +440,20 @@ void Hoja2()
 
 	footstepSound->Play();
 
-	//Para calcular la velocidad de una fuente de sonido utilizamos la posicion de la entidad
-	//vel.x = (pos.x - lastPos.x) * elapsed;
 	render(minDistance, maxDistance, insideConeAngle, outsideConeAngle);
 
-	using namespace std::chrono;
-
-	high_resolution_clock::time_point lastTime = high_resolution_clock::now();
 	bool moving = false;
 	double ZDestination;
 	int i = 0;
 
+	//using namespace std::chrono;
+	//high_resolution_clock::time_point lastTime = high_resolution_clock::now();
 	while (true)
 	{
+		//high_resolution_clock::time_point current = high_resolution_clock::now();
+		//duration<double> time_span = duration_cast<duration<double>>(current - lastTime);
+		//lastTime = current;
+
 		if (_kbhit())
 		{
 			int key = _getche();
@@ -576,8 +577,8 @@ void Hoja2()
 				maxDistance -= 0.1f;
 				footstepSound->SetMaxDistance(maxDistance);
 			}
-
-			else if (!moving && (key == 'M') || (key == 'm'))
+			//Efecto Doppler
+			else if (!moving && ((key == 'M') || (key == 'm')))
 			{
 				//Si estoy abajo
 				if (sourcePos.z > 15)
@@ -585,24 +586,25 @@ void Hoja2()
 					i = 0;
 					moving = true;
 					ZDestination = sourcePos.z - 2 * (sourcePos.z - 15);
+					footstepSound->SetVel({ 0,0,-10 });
 				}
 				else if (sourcePos.z < 15)
 				{
 					i = 0;
 					moving = true;
 					ZDestination = sourcePos.z + 2 * (15 - sourcePos.z);
+					footstepSound->SetVel({ 0,0,10 });
 				}
 			}
 
 			render(minDistance, maxDistance, insideConeAngle, outsideConeAngle);
 
 		}
-		high_resolution_clock::time_point current = high_resolution_clock::now();
-		duration<double> time_span = duration_cast<duration<double>>(current - lastTime);
-		lastTime = current;
 
+		//Comprobar si se tiene que mover el source
 		if (moving)
 		{
+			//Cada cuanto tiempo se mueve el source
 			if (i == 100)
 			{
 				tileMap[(int)sourcePos.z - 1][(int)sourcePos.x - 1] = NONE;
@@ -621,7 +623,10 @@ void Hoja2()
 
 				//He llegado al destino
 				if (sourcePos.z == ZDestination)
+				{
 					moving = false;
+					footstepSound->SetVel({ 0,0,0 });
+				}
 
 				tileMap[(int)sourcePos.z - 1][(int)sourcePos.x - 1] = SOURCE;
 				render(minDistance, maxDistance, insideConeAngle, outsideConeAngle);
@@ -630,7 +635,7 @@ void Hoja2()
 			}
 		}
 
-		footstepSound->Update(time_span.count());
+		footstepSound->Update();
 
 		LowLevelSystem::GetInstance()->Update();
 

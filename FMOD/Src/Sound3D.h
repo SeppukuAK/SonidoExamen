@@ -9,7 +9,7 @@ class Sound3D : public Sound {
 private:
 	//Atributos del canal 3D
 	FMOD_VECTOR _pos;
-	FMOD_VECTOR _lastPos;
+	FMOD_VECTOR _vel;
 	FMOD_VECTOR _dir;
 
 	float _minDistance = 1.0;
@@ -28,6 +28,7 @@ public:
 	~Sound3D();
 
 	void SetPos(FMOD_VECTOR pos);
+	void SetVel(FMOD_VECTOR vel);
 
 	void SetMinDistance(float min);
 	void SetMaxDistance(float max);
@@ -40,6 +41,5 @@ public:
 	void SetReverbWet(float reverbWet);
 	void Set3DSpread(float degrees);
 
-	virtual void Update(double elapsed = 0);
 };
 #endif // #ifndef __Sound3D_h_

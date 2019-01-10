@@ -7,10 +7,8 @@ Sound3D::Sound3D(std::string name, FMOD_MODE mode, FMOD_CREATESOUNDEXINFO *exinf
 
 	LowLevelSystem::ERRCHECK(_channel->getFrequency(&_frequency)); //Inicializa el valor de frequency
 	LowLevelSystem::ERRCHECK(_channel->get3DSpread(&_spread));
-	LowLevelSystem::ERRCHECK(_channel->get3DAttributes(&_pos, nullptr));
+	LowLevelSystem::ERRCHECK(_channel->get3DAttributes(&_pos, &_vel));
 	LowLevelSystem::ERRCHECK(_channel->get3DConeOrientation(&_dir));
-
-	_lastPos = _pos;
 }
 
 Sound3D::~Sound3D() {} //Lla a la constructora padre para liberar el sonido
@@ -18,10 +16,17 @@ Sound3D::~Sound3D() {} //Lla a la constructora padre para liberar el sonido
 //Establece la posición del sonido
 void Sound3D::SetPos(FMOD_VECTOR pos) {
 	CheckState();
-	_lastPos = _pos;
 	_pos = pos;
 
-	LowLevelSystem::ERRCHECK(_channel->set3DAttributes(&_pos, nullptr));
+	LowLevelSystem::ERRCHECK(_channel->set3DAttributes(&_pos, &_vel));
+}
+
+//Establece la velocidad del sonido
+void Sound3D::SetVel(FMOD_VECTOR vel) {
+	CheckState();
+	_vel = vel;
+
+	LowLevelSystem::ERRCHECK(_channel->set3DAttributes(&_pos, &_vel));
 }
 
 // Establece la Distancia a partir de la cual el sonido empieza a atenuarse
@@ -91,6 +96,7 @@ void Sound3D::Set3DSpread(float degrees)
 void Sound3D::ResetChannel() {
 	Sound::ResetChannel();//Llamada al método de Sound
 	SetPos(_pos);
+	SetVel(_vel);
 	SetMinDistance(_minDistance);
 	SetMaxDistance(_maxDistance);
 	SetConeOrientation(_dir);
@@ -99,17 +105,4 @@ void Sound3D::ResetChannel() {
 	SetOutsideVolume(_outsideVolume);
 	SetReverbWet(_reverbWet);
 	Set3DSpread(_spread);
-}
-
-//Calcula la velocidad del sonido
-void Sound3D::Update(double elapsed) {
-	Sound::Update(elapsed);
-
-	FMOD_VECTOR vel;
-	vel.x = (_pos.x - _lastPos.x) * elapsed;
-	vel.y = (_pos.y - _lastPos.y) * elapsed;
-	vel.z = (_pos.z - _lastPos.z) * elapsed;
-
-	LowLevelSystem::ERRCHECK(_channel->set3DAttributes(&_pos, &vel));
-
 }

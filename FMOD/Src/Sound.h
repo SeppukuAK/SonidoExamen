@@ -37,7 +37,7 @@ public:
 	void Resume();
 	void TogglePaused();
 
-	virtual void Update(double elapsed = 0);
+	void Update();
 
 	//Métodos de comprobación de estado
 	bool IsPlaying();
