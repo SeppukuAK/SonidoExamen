@@ -746,8 +746,9 @@ void DSPExample()
 			if ((key == 'Q') || (key == 'q'))
 				break;
 
-			LowLevelSystem::GetInstance()->Update();
 		}
+		LowLevelSystem::GetInstance()->Update();
+
 	}
 
 	delete sound;

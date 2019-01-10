@@ -7,10 +7,6 @@ Cosas que hacer si nos sobra la vida:
 -Ajustar parametros desde sound
 -ESTADO STOPPED
 
-Ejemplo de posicioanmiento 3d: 27 y por ahi
-Velocidad. 28
-
-
 Progreso:
 21 -22 : Channel group. 
 Channel group lo dejamos para más tarde

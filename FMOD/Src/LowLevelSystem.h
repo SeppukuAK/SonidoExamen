@@ -43,9 +43,6 @@ public:
 
 	FMOD::Channel* CreateChannel(FMOD::Sound *sound, FMOD::ChannelGroup * channelGroup = nullptr);
 	FMOD::ChannelGroup* CreateChannelGroup(std::string name);
-
-	//TODO: CHANNEL GROUP
-
 	FMOD::Reverb3D* CreateReverb();
 	FMOD::Geometry* CreateGeometry(int maxPoligons, int maxVertex);
 	FMOD::DSP* CreateDSPByType(FMOD_DSP_TYPE DSPType);
